@@ -10,8 +10,9 @@ class KMeans:
     def __init__(self, filename, n_clusters):
         self.filename = filename
         self.n_clusters = n_clusters
-        clusters = []
-        data = None
+        self.clusters = []
+        self.data = None
+
     #imports data and checks that it is a valid filetype
     def importData(self):
         self.data = pd.read_csv("{}".format(self.filename))
