@@ -1,3 +1,7 @@
+'''
+#### Kmeans implementation assignment 1 for Scientific Data Management ####
+### See test folder for tests
+'''
 import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
@@ -7,9 +11,9 @@ from matplotlib import plt #useful for visualising data
 
 class KMeans:
     
-    def __init__(self, filename, n_clusters):
+    def __init__(self, filename, k_clusters):
         self.filename = filename
-        self.n_clusters = n_clusters
+        self.k_clusters = k_clusters
         self.clusters = []
         self.data = None
 
@@ -25,7 +29,8 @@ class KMeans:
             return
         print('{}\n {}\n {}\n {}\n'.format(self.data.head(), self.data.info(), self.data.describe(), self.data.columns))
 
-    def initalise_cluster(self):
+    #assign k clusters to list
+    def initalise_clusters(self):
         #TODO
         pass
 
@@ -44,3 +49,4 @@ class KMeans:
     def visualise_clusters(self):
         #TODO
         pass
+    
