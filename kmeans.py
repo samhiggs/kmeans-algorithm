@@ -50,7 +50,7 @@ class KMeans:
             print('{} is an invalid filetype'.format(ftype))
             return
 
-    def outputTest
+    #def outputTest
     #summary of data
     def dataSummary(self):
         #TODO
@@ -72,7 +72,7 @@ class KMeans:
     #create a training and test set of the data. Timeseries will need to be handled
     #differently to other data..
     def create_training_test_set(self, ratio=.8, timeseries=False):
-        if ratio < 0.0 or ratio > 1.0:s
+        if ratio < 0.0 or ratio > 1.0:
             print('ratio must be as a float between 0.0 and 1.0')
             return False
         print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
