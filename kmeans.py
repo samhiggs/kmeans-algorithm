@@ -24,6 +24,8 @@ import seaborn as sns #useful for splitting test and training data set and other
 from matplotlib import pyplot as plt #useful for visualising data
 import abc
 
+import os
+
 class KMeans:
     
     def __init__(self, filename, k_clusters=0):
@@ -40,11 +42,11 @@ class KMeans:
     def importData(self):
         print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
-        ftype = ''
-        if ftype is 'csv':
+        filename, ftype = os.path.splitext(self.filename)
+        if ftype == '.csv':
             self.data = pd.read_csv("{}".format(self.filename))
-        if ftype is 'txt':
-            #TODO
+        if ftype == '.txt':
+            self.data = pd.read_csv(self.filename, sep="\t", header=None)
             pass
         else:
             print('{} is an invalid filetype'.format(ftype))
@@ -111,7 +113,7 @@ class KMeans:
 
 #If we want to run as a script using some test data
 if __name__ == '__main__':
-    kmeans = KMeans('data\Skin_NonSkin.txt')
+    kmeans = KMeans('data/Skin_NonSkin.txt')
     kmeans.importData()
     kmeans.dataSummary()
     kmeans.initialise_clusters()
