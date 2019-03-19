@@ -19,7 +19,7 @@ import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
-from matplotlib import plt #useful for visualising data
+from matplotlib import pyplot as plt #useful for visualising data
 
 class KMeans:
     
@@ -33,6 +33,7 @@ class KMeans:
 
     #imports data and checks that it is a valid filetype
     def importData(self):
+        print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
         ftype = ''
         if ftype is 'csv':
@@ -68,27 +69,33 @@ class KMeans:
         if ratio < 0 or ratio > 1:
             print('ratio must be as a decimal between 0 and 1')
             return False
+        print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
         #TODO
         pass
 
     #assign k clusters to list
     def initialise_clusters(self):
+        print('initialising clusters')
         #TODO
         pass
 
     def initial_observations(self):
+        print('running initial observation of clusters...')
         #TODO
         pass
 
     def recursive_observations(self):
+        print('running algorithm...')
         #TODO
         pass
 
     def print_clusters(self):
+        print('Here are the clusters')
         #TODO
         pass
 
     def visualise_clusters(self):
+        print('and in a nice pretty diagram!')
         #TODO
         pass
 
