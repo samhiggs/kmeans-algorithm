@@ -32,25 +32,43 @@ class KMeans:
         self.filename = filename
         self.k_clusters = k_clusters
         self.clusters = []
-        self.data = None
+        self.raw_data = None
+        self.data = []
         self.training_set = None
         self.test_set = None
         self.init_strategy = None
         self.update_strategy = None
 
-    #imports data and checks that it is a valid filetype
+    #imports raw data and checks that it is a valid filetype.
     def importData(self):
         print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
         filename, ftype = os.path.splitext(self.filename)
         if ftype == '.csv':
-            self.data = pd.read_csv("{}".format(self.filename))
+            self.raw_data = pd.read_csv("{}".format(self.filename))
         if ftype == '.txt':
-            self.data = pd.read_csv(self.filename, sep="\t", header=None)
+            self.raw_data = pd.read_csv(self.filename, sep="\t", header=None)
             pass
         else:
             print('{} is an invalid filetype'.format(ftype))
             return
+
+    # converts data from csv (N columns) to list of points point cloud.
+    def convertData(self):
+        if self.data is None or len(self.raw_data) is 0:
+            raise Exception('now raw data available, nothing to convert')
+        i = 0
+        while i < len(self.raw_data):
+            point = []
+            for j in range(0, len(self.raw_data.columns)):
+            #    print(j)
+                point.append(self.raw_data[j][i])
+            point = tuple(point)
+            #print(point)
+            i+=1
+            self.data.append(point)
+
+
 
     #def outputTest
     #summary of data
@@ -115,6 +133,7 @@ class KMeans:
 if __name__ == '__main__':
     kmeans = KMeans('data/Skin_NonSkin.txt')
     kmeans.importData()
+    kmeans.convertData()
     kmeans.dataSummary()
     kmeans.initialise_clusters()
     kmeans.initial_observations()

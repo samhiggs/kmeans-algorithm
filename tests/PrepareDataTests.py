@@ -10,11 +10,19 @@ class LoadDataTests(unittest.TestCase):
 
     def test_import_data_basic(self):
         kmeans = self.setup()
-        assert kmeans.data is not None
+        assert kmeans.raw_data is not None
         pass
 
     def test_import_data_columns(self):
         kmeans = kmeans = self.setup()
-        assert len(kmeans.data.columns) > 0
+        assert len(kmeans.raw_data.columns) > 0
         #print(kmeans.data[0])
+        pass
+
+    def test_convert_data_pointlist(self):
+        kmeans = kmeans = self.setup()
+        kmeans.convertData()
+        #print (len(kmeans.data))
+        #print(len(kmeans.raw_data))
+        assert len(kmeans.data) == len(kmeans.raw_data)
         pass
