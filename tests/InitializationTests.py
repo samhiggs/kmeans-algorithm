@@ -1,4 +1,5 @@
 import unittest
+import kmeans
 
 class InitializationTests(unittest.TestCase):
 

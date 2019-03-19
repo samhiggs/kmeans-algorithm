@@ -19,7 +19,7 @@ import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
-from matplotlib import pyplot as plt #useful for visualising data
+from matplotlib.pyplot as plt #useful for visualising data
 
 class KMeans:
     
