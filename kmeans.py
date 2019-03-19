@@ -85,8 +85,8 @@ class KMeans:
     #assign k clusters to list
     def initialise_clusters(self):
         print('initialising clusters')
-        #TODO
-        pass
+        self.init_strategy.init(self.k_clusters, self.training_set)
+        #Returns a list of indices of the initial cluster points of the dataset
 
     def initial_observations(self):
         print('running initial observation of clusters...')

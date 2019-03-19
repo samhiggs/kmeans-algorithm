@@ -10,7 +10,7 @@ Then run pip install -r requirements.txt to install dependencies
 1. Everyone writes someone elses test cases
 2. Everyone hardcodes expected outputs of their domain
 3. Everyone takes the inputs and works on developing an output testing against test caes
-4. Split the algorithm into the 2 models and 2 teams.
+4. Split the work into update and init algorithms and we work on that..
 5. Train the models and tweak algorithm
 6. Test and improve
 7. Run against test set
@@ -19,8 +19,8 @@ Then run pip install -r requirements.txt to install dependencies
 ## TEAM GOAL PRIORITIES
 * Implement basic testcases
 * implement a fully working script with defined K, random initialisation and Lloyds.
-* Implement Mac Queen & 1 other initialisation technique
-* Implement 1 other initialisation technique
+* Implement Mac Queen Update & furthest point technique
+* Implement 1 other pre-clustered sample initialisation technique
 
 ## Team TODO List
 STRATEGY PATTERN TODO:
