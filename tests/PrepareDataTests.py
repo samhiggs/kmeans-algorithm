@@ -24,5 +24,5 @@ class LoadDataTests(unittest.TestCase):
         kmeans.convertData()
         #print (len(kmeans.data))
         #print(len(kmeans.raw_data))
-        assert len(kmeans.data) == len(kmeans.raw_data)
+        assert len(kmeans.point_cloud) == len(kmeans.raw_data)
         pass

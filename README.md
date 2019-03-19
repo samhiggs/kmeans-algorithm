@@ -24,7 +24,7 @@ Then run pip install -r requirements.txt to install dependencies
 
 ## Team TODO List
 STRATEGY PATTERN TODO:
-* Create 2 concrete classes for the update_strategy (1 hr)
+* Create 2 concrete classes for the update_strategy (1 hr) (Lorenz)
 * Create 3 concrete classes for init_strategy (1 hr)
 * Update kmeans.py (context class) to implement this (1 hr)
 * decide on which 2 initialisation strategies we use (2 hrs)
@@ -49,7 +49,7 @@ KMEANS TODO
 
 
 ## TO FIND OUT
-1. Will K always be given or do we have to find out 
+1. Will K always be given or do we have to find out. Asnwear = It s labeled data, skinf or no skin
 2. Is speed important, should we be concerned with parallelisation? 
 3. Points in space or points of data? (I think points of data)
 4. Does the data need to be cleaned

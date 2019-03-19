@@ -33,7 +33,7 @@ class KMeans:
         self.k_clusters = k_clusters
         self.clusters = []
         self.raw_data = None
-        self.data = []
+        self.point_cloud = []
         self.training_set = None
         self.test_set = None
         self.init_strategy = None
@@ -53,20 +53,18 @@ class KMeans:
             print('{} is an invalid filetype'.format(ftype))
             return
 
-    # converts data from csv (N columns) to list of points point cloud.
+    # converts data from csv (N columns) to nparray of points point cloud.
     def convertData(self):
-        if self.data is None or len(self.raw_data) is 0:
+        if self.point_cloud is None or len(self.raw_data) is 0:
             raise Exception('now raw data available, nothing to convert')
         i = 0
         while i < len(self.raw_data):
             point = []
             for j in range(0, len(self.raw_data.columns)):
-            #    print(j)
                 point.append(self.raw_data[j][i])
-            point = tuple(point)
-            #print(point)
+            point = np.array(point)
             i+=1
-            self.data.append(point)
+            self.point_cloud.append(point)
 
 
 
@@ -74,10 +72,10 @@ class KMeans:
     #summary of data
     def dataSummary(self):
         #TODO
-        if self.data is None or len(self.data) is 0:
+        if self.point_cloud is None or len(self.point_cloud) is 0:
             print('the data has not been created in dataSummary()')
             return False
-        print('{}\n {}\n {}\n {}\n'.format(self.data.head(), self.data.info(), self.data.describe(), self.data.columns))
+        print('{}\n {}\n {}\n {}\n'.format(self.point_cloud.head(), self.point_cloud.info(), self.point_cloud.describe(), self.point_cloud.columns))
         if self.k_clusters == 0:
             #TODO
             pass
@@ -96,7 +94,7 @@ class KMeans:
             print('ratio must be as a float between 0.0 and 1.0')
             return False
         print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
-        self.training_set, self.test_set = train_test_split(self.data, ratio)
+        self.training_set, self.test_set = train_test_split(self.point_cloud, ratio)
         if self.training_set is not None and self.test_set is not None:
             return True
         return False

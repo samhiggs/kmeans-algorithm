@@ -6,7 +6,6 @@ class AbstractUpdate(ABC):
         pass
 
 class LloydUpdate(AbstractUpdate):
-
     def update(self):
         pass
 
