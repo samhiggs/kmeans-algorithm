@@ -1,5 +1,6 @@
 README.md
 kmeans.py
+setup.py
 sdm_assignment_1.egg-info/PKG-INFO
 sdm_assignment_1.egg-info/SOURCES.txt
 sdm_assignment_1.egg-info/dependency_links.txt
