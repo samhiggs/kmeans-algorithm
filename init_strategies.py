@@ -34,24 +34,46 @@ class FarthestPointsInit(AbstractInit):
         np.random.seed(2019)
         centroids_indices.append(np.random.randint(low = 0, high = len(point_cloud)-1))
 
-        #WHILE there are fewer than k points DO
-        #   Add the point whose minimum distance from the selected points is as large as possible;
-        #END
+        #While the number of centroids is smaller than the number of desired clusters
         while len(centroids_indices) < k_clusters:
-            distances = []
-            for i in range(0, len(centroids_indices)):
-                for j in range(0, len(point_cloud)):
-                    dist = np.linalg.norm(point_cloud[centroids_indices[i]] - point_cloud[j], ord=None)
-                    distances.append((j, dist))
 
-            min_dist = float("inf")
+            #For each point that is not a centroid, find its distances to all centroids and push into a KV dictionary.
+            #Key = point index, Values = array of distances to the centroids
+            distances = {}
+            for point_idx in range(0, len(point_cloud)):
+                for centroid_idx in range(0, len(centroids_indices)):
+                    dist = np.linalg.norm(point_cloud[centroids_indices[centroid_idx]] - point_cloud[point_idx], ord=None)
+                    if dist > 0:
+                        if point_idx in distances:
+                            currently_stored = distances.get(point_idx)
+                            distances[point_idx] = np.append(currently_stored, dist)
+                        else:
+                            distances[point_idx] = [dist]
+
+            #For each points array of distances to all centroids, find its smallest distance to a centroid
+            min_distances = {}
+            distance_keys = distances.keys()
+            for key in distance_keys:
+                distances_per_point = distances.get(key)
+                min_distance_per_point = float("inf")
+                for distance in distances_per_point:
+                    if distance < min_distance_per_point:
+                        min_distance_per_point = distance
+                min_distances[key] = min_distance_per_point
+
+            #From the array of smallest distancees to any centroid, find the largest one.
+            #The point that has this largest distance will become the next centroid
+            min_distance_keys = min_distances.keys()
+            max_dist = 0
             ind = None
-            for tuple in distances:
-                if tuple[1] < min_dist:
-                    min_dist = tuple[1]
-                    ind = tuple[0]
+            for key in min_distance_keys:
+                dist = distances.get(key)
+                if dist[0] > max_dist:
+                    max_dist = dist[0]
+                    ind = key
 
-            point_cloud = np.delete(point_cloud, point_cloud[ind], 0)
+            #Remove the new centroid from the point cloud and add it to array of centroids.
+            #point_cloud = np.delete(point_cloud, point_cloud[ind], 0)
             centroids_indices.append(ind)
             print(max_dist)
             print(centroids_indices)
