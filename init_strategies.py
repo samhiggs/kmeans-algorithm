@@ -21,8 +21,9 @@ class RandomInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
         pass
 
-#See the following sources for description of the algorithm, particularly (1)
+#See the following sources for description of the algorithm, particularly (1),(2)
 #(1)Page 17: http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf
+#(3)Page 3: https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf
 #(2)https://larssonjohan.com/post/2016-10-30-farthest-points/
 class FarthestPointsInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
@@ -43,7 +44,7 @@ class FarthestPointsInit(AbstractInit):
             for point_idx in range(0, len(point_cloud)):
                 for centroid_idx in range(0, len(centroids_indices)):
                     dist = np.linalg.norm(point_cloud[centroids_indices[centroid_idx]] - point_cloud[point_idx], ord=None)
-                    if dist > 0:
+                    if not centroids_indices.__contains__(point_idx):
                         if point_idx in distances:
                             currently_stored = distances.get(point_idx)
                             distances[point_idx] = np.append(currently_stored, dist)
@@ -72,8 +73,7 @@ class FarthestPointsInit(AbstractInit):
                     max_dist = dist[0]
                     ind = key
 
-            #Remove the new centroid from the point cloud and add it to array of centroids.
-            #point_cloud = np.delete(point_cloud, point_cloud[ind], 0)
+            #Add the new index to the centroids
             centroids_indices.append(ind)
             print(max_dist)
             print(centroids_indices)
