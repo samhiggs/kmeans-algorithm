@@ -1,6 +1,11 @@
 # sdm_kmeans
 Scientific Data Management Assignment 1 KMeans Clustering
 
+## Notes for Codebase
+firstly run python setup.py install
+Then run pip install -r requirements.txt to install dependencies
+
+
 ## Way of approaching tasks
 1. Everyone writes someone elses test cases
 2. Everyone hardcodes expected outputs of their domain
@@ -11,21 +16,41 @@ Scientific Data Management Assignment 1 KMeans Clustering
 7. Run against test set
 8. Upload
 
+## TEAM GOAL PRIORITIES
+* Implement basic testcases
+* implement a fully working script with defined K, random initialisation and Lloyds.
+* Implement Mac Queen & 1 other initialisation technique
+* Implement 1 other initialisation technique
+
 ## Team TODO List
-1. Write testcases
-2. Import data from txt and csv filetype into a pandas dataframe
-3. Clean data if necessary?
-4. display a summary of data and if k_clusters isn't defined then find optimal number for K (might not be necessary?)
+STRATEGY PATTERN TODO:
+* Create 2 concrete classes for the update_strategy (1 hr)
+* Create 3 concrete classes for init_strategy (1 hr)
+* Update kmeans.py (context class) to implement this (1 hr)
+* decide on which 2 initialisation strategies we use (2 hrs)
+
+KMEANS TODO
+1. Write testcases (ALL) (1hr each)
+    Divide up testcases
+    Write outputs for functions (ALL)
+
+2. Import data from txt and csv filetype into a pandas dataframe (20 mins)
+
+3. Clean data if necessary? (Unnecessary)
+4. display a summary of data (20 mins)
+    AND if k_clusters isn't defined then find optimal number for K (might not be necessary?) (2 hrs)
 5. Split data into training and test set potentially creating a case for time series
-but can probably just leave that for now.
-6. Initialise clusters creating the correct data structure for them and setting up the data for parallellisation if necessary?
-7. Determine the initial observations.
-8. Create our first recursive observation algorithm.
-9. Print our result and a visual representation of it.
+    but can probably just leave that for now. (20 mins)
+6. Implement each initialisation strategy (3 hrs each)
+8. Implement each update strategy (3 hrs each)
+9. Print our result and a visual representation of it. (30 mins)
+10. Improve our results (~)
+11. Submit! (30 mins)
 
 
 ## TO FIND OUT
-1. Will K always be given
+1. Will K always be given or do we have to find out 
 2. Is speed important, should we be concerned with parallelisation? 
-3. 
+3. Points in space or points of data? (I think points of data)
+4. Does the data need to be cleaned
 

@@ -17,9 +17,12 @@ data:https://archive.ics.uci.edu/ml/machine-learning-databases/00372/
 import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
+from sklearn.model_selection import train_test_split
+
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
-from matplotlib.pyplot as plt #useful for visualising data
+from matplotlib import pyplot as plt #useful for visualising data
+import abc
 
 class KMeans:
     
@@ -45,6 +48,7 @@ class KMeans:
             print('{} is an invalid filetype'.format(ftype))
             return
 
+    def outputTest
     #summary of data
     def dataSummary(self):
         #TODO
@@ -66,11 +70,14 @@ class KMeans:
     #create a training and test set of the data. Timeseries will need to be handled
     #differently to other data..
     def create_training_test_set(self, ratio=.8, timeseries=False):
-        if ratio < 0 or ratio > 1:
-            print('ratio must be as a decimal between 0 and 1')
+        if ratio < 0.0 or ratio > 1.0:s
+            print('ratio must be as a float between 0.0 and 1.0')
             return False
         print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
-        #TODO
+        self.training_set, self.test_set = train_test_split(self.data, ratio)
+        if self.training_set is not None and self.test_set is not None:
+            return True
+        return False
         pass
 
     #assign k clusters to list
@@ -98,6 +105,7 @@ class KMeans:
         print('and in a nice pretty diagram!')
         #TODO
         pass
+
 
 #If we want to run as a script using some test data
 if __name__ == '__main__':
