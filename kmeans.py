@@ -30,6 +30,8 @@ class KMeans:
         self.data = None
         self.training_set = None
         self.test_set = None
+        self.init_strategy = None
+        self.update_strategy = None
 
     #imports data and checks that it is a valid filetype
     def importData(self):
