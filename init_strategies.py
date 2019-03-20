@@ -28,7 +28,6 @@ class RandomInit(AbstractInit):
 class FarthestPointsInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
 
-        point_cloud_working_set = np.array(point_cloud)
         centroids_indices = []
 
         #First pick a random point
@@ -68,19 +67,16 @@ class FarthestPointsInit(AbstractInit):
             min_distance_keys = min_distances.keys()
             max_dist = 0
             ind = None
-            cnt = 0
             for key in min_distance_keys:
                 dist = distances.get(key)[0]
                 if dist > max_dist:
-                    cnt+=1
-                    print(dist)
                     max_dist = dist
                     ind = key
-            print(cnt)
+
             #Add the new index to the centroids
             centroids_indices.append(ind)
-            print(max_dist)
-            print(centroids_indices)
+            #print(max_dist)
+            #print(centroids_indices)
         return centroids_indices
 
 class PreClusterdSampleInit(AbstractInit):

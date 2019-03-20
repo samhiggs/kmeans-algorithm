@@ -40,7 +40,7 @@ class KMeans:
         self.update_strategy = None
 
     #imports raw data and checks that it is a valid filetype.
-    def importData(self):
+    def import_data(self):
         print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
         filename, ftype = os.path.splitext(self.filename)
@@ -55,7 +55,7 @@ class KMeans:
             return
 
     # converts data from tsv (N columns) to nparray of points point cloud.
-    def convertData(self):
+    def convert_data(self):
         if self.point_cloud is None or len(self.raw_data) is 0:
             raise Exception('now raw data available, nothing to convert')
         i = 0
@@ -131,8 +131,8 @@ class KMeans:
 #If we want to run as a script using some test data
 if __name__ == '__main__':
     kmeans = KMeans('data/Skin_NonSkin.txt')
-    kmeans.importData()
-    kmeans.convertData()
+    kmeans.import_data()
+    kmeans.convert_data()
     kmeans.dataSummary()
     kmeans.initialise_clusters()
     kmeans.initial_observations()

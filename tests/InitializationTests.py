@@ -4,16 +4,30 @@ from init_strategies import FarthestPointsInit
 
 class InitializationTests(unittest.TestCase):
 
-    def setup(self):
+    def setup_txt(self):
         kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/Skin_NonSkin.txt', 3)
-        kmeans.importData()
-        kmeans.convertData()
+        kmeans.import_data()
+        kmeans.convert_data()
         return kmeans
 
-    def test_farthest_points_init(self):
-        kmeans=self.setup()
-        initStrategy = FarthestPointsInit()
-        initStrategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+    def setup_csv(self):
+        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/HTRU2/HTRU_2.csv', 3)
+        kmeans.import_data()
+        kmeans.convert_data()
+        return kmeans
+
+
+    def test_farthest_points_init_txt(self):
+        kmeans=self.setup_txt()
+        init_strategy = FarthestPointsInit()
+        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        assert len(kmeans.clusters) == kmeans.k_clusters
+
+    def test_farthest_points_init_csv(self):
+        kmeans=self.setup_csv()
+        init_strategy = FarthestPointsInit()
+        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        assert len(kmeans.clusters) == kmeans.k_clusters
 
     def test_cluster_create(self):
 

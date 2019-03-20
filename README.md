@@ -4,6 +4,7 @@ Scientific Data Management Assignment 1 KMeans Clustering
 ## Notes for Codebase
 firstly run python setup.py install
 Then run pip install -r requirements.txt to install dependencies
+Recommended style guide: https://www.python.org/dev/peps/pep-0008/
 
 
 ## Way of approaching tasks

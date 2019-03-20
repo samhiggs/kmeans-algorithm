@@ -5,12 +5,12 @@ class LoadDataTests(unittest.TestCase):
 
     def setupTxt(self):
         kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/Skin_NonSkin.txt', 3)
-        kmeans.importData()
+        kmeans.import_data()
         return kmeans
 
     def setupCsv(self):
         kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/HTRU2/HTRU_2.csv', 3)
-        kmeans.importData()
+        kmeans.import_data()
         return kmeans
 
     def test_import_data_basic_txt(self):
@@ -38,12 +38,12 @@ class LoadDataTests(unittest.TestCase):
 
     def test_convert_data_pointlist_txt(self):
         kmeans = self.setupTxt()
-        kmeans.convertData()
+        kmeans.convert_data()
         assert len(kmeans.point_cloud) == len(kmeans.raw_data)
         pass
 
     def test_convert_data_pointlist_csv(self):
         kmeans = self.setupCsv()
-        kmeans.convertData()
+        kmeans.convert_data()
         assert len(kmeans.point_cloud) == len(kmeans.raw_data)
         pass
