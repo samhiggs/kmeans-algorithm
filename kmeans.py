@@ -45,15 +45,16 @@ class KMeans:
         #read the filetype and run relevant case
         filename, ftype = os.path.splitext(self.filename)
         if ftype == '.csv':
-            self.raw_data = pd.read_csv("{}".format(self.filename))
+            self.raw_data = pd.read_csv(self.filename, header=None)
+            return
         if ftype == '.txt':
             self.raw_data = pd.read_csv(self.filename, sep="\t", header=None)
-            pass
+            return
         else:
             print('{} is an invalid filetype'.format(ftype))
             return
 
-    # converts data from csv (N columns) to nparray of points point cloud.
+    # converts data from tsv (N columns) to nparray of points point cloud.
     def convertData(self):
         if self.point_cloud is None or len(self.raw_data) is 0:
             raise Exception('now raw data available, nothing to convert')
@@ -66,7 +67,7 @@ class KMeans:
             i+=1
             self.point_cloud.append(point)
 
-
+    # converts data from csv (N columns) to nparray of points point cloud.
 
     #def outputTest
     #summary of data

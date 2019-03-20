@@ -34,6 +34,7 @@ class FarthestPointsInit(AbstractInit):
         #First pick a random point
         np.random.seed(2019)
         centroids_indices.append(np.random.randint(low = 0, high = len(point_cloud)-1))
+        a = []
 
         #While the number of centroids is smaller than the number of desired clusters
         while len(centroids_indices) < k_clusters:
@@ -42,16 +43,16 @@ class FarthestPointsInit(AbstractInit):
             #Key = point index, Values = array of distances to the centroids
             distances = {}
             for point_idx in range(0, len(point_cloud)):
-                for centroid_idx in range(0, len(centroids_indices)):
-                    dist = np.linalg.norm(point_cloud[centroids_indices[centroid_idx]] - point_cloud[point_idx], ord=None)
-                    if not centroids_indices.__contains__(point_idx):
+                if not centroids_indices.__contains__(point_idx):
+                    for centroid_idx in range(0, len(centroids_indices)):
+                        dist = np.linalg.norm(point_cloud[centroids_indices[centroid_idx]] - point_cloud[point_idx], ord=None)
                         if point_idx in distances:
                             currently_stored = distances.get(point_idx)
                             distances[point_idx] = np.append(currently_stored, dist)
                         else:
                             distances[point_idx] = [dist]
 
-            #For each points array of distances to all centroids, find its smallest distance to a centroid
+            #For each point's array of distances to all centroids, find its smallest distance to a centroid
             min_distances = {}
             distance_keys = distances.keys()
             for key in distance_keys:
@@ -67,17 +68,20 @@ class FarthestPointsInit(AbstractInit):
             min_distance_keys = min_distances.keys()
             max_dist = 0
             ind = None
+            cnt = 0
             for key in min_distance_keys:
-                dist = distances.get(key)
-                if dist[0] > max_dist:
-                    max_dist = dist[0]
+                dist = distances.get(key)[0]
+                if dist > max_dist:
+                    cnt+=1
+                    print(dist)
+                    max_dist = dist
                     ind = key
-
+            print(cnt)
             #Add the new index to the centroids
             centroids_indices.append(ind)
             print(max_dist)
             print(centroids_indices)
-            pass
+        return centroids_indices
 
 class PreClusterdSampleInit(AbstractInit):
     #http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf

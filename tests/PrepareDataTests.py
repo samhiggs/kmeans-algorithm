@@ -3,26 +3,47 @@ from kmeans import KMeans
 
 class LoadDataTests(unittest.TestCase):
 
-    def setup(self):
+    def setupTxt(self):
         kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/Skin_NonSkin.txt', 3)
         kmeans.importData()
         return kmeans
 
-    def test_import_data_basic(self):
-        kmeans = self.setup()
+    def setupCsv(self):
+        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/HTRU2/HTRU_2.csv', 3)
+        kmeans.importData()
+        return kmeans
+
+    def test_import_data_basic_txt(self):
+        kmeans = self.setupTxt()
         assert kmeans.raw_data is not None
         pass
 
-    def test_import_data_columns(self):
-        kmeans = kmeans = self.setup()
-        assert len(kmeans.raw_data.columns) > 0
-        #print(kmeans.data[0])
+    def test_import_data_basic_csv(self):
+        kmeans = self.setupCsv()
+        assert kmeans.raw_data is not None
         pass
 
-    def test_convert_data_pointlist(self):
-        kmeans = kmeans = self.setup()
+    def test_import_data_columns_txt(self):
+        kmeans = self.setupTxt()
+        assert len(kmeans.raw_data.columns) > 0
+
+        kmeans = self.setupCsv()
+        assert len(kmeans.raw_data.columns) > 0
+        pass
+
+    def test_import_data_columns_csv(self):
+        kmeans = self.setupCsv()
+        assert len(kmeans.raw_data.columns) > 0
+        pass
+
+    def test_convert_data_pointlist_txt(self):
+        kmeans = self.setupTxt()
         kmeans.convertData()
-        #print (len(kmeans.data))
-        #print(len(kmeans.raw_data))
+        assert len(kmeans.point_cloud) == len(kmeans.raw_data)
+        pass
+
+    def test_convert_data_pointlist_csv(self):
+        kmeans = self.setupCsv()
+        kmeans.convertData()
         assert len(kmeans.point_cloud) == len(kmeans.raw_data)
         pass

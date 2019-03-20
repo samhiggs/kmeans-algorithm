@@ -13,7 +13,7 @@ class InitializationTests(unittest.TestCase):
     def test_farthest_points_init(self):
         kmeans=self.setup()
         initStrategy = FarthestPointsInit()
-        initStrategy.init(k_clusters=8, point_cloud=kmeans.point_cloud)
+        initStrategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
 
     def test_cluster_create(self):
 
