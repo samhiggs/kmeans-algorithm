@@ -88,8 +88,8 @@ class FarthestPointsInit(AbstractInit):
 
             #Add the new index to the centroids
             centroids_indices.append(ind)
-            print(max_dist)
-            print(centroids_indices)
+            #print(max_dist)
+            #print(centroids_indices)
         return centroids_indices
 
 class PreClusterdSampleInit(AbstractInit):
