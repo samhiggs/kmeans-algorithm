@@ -18,6 +18,7 @@ class AbstractInit(ABC):
         pass
 
 #Randomly initializes the k centroids for the cluster.
+#TODO: Imporve defensive programming
 class RandomInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
@@ -27,14 +28,16 @@ class RandomInit(AbstractInit):
         while len(centroids_indices) < k_clusters:
             centroids_indices.append(np.random.randint(low=0, high=len(point_cloud) - 1))
 
-        print(centroids_indices)
+        #print(centroids_indices)
         return centroids_indices
         pass
+
 
 #See the following sources for description of the algorithm, particularly (1),(2)
 #(1)Page 17: http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf
 #(3)Page 3: https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf
 #(2)https://larssonjohan.com/post/2016-10-30-farthest-points/
+#TODO: Imporve defensive programming
 class FarthestPointsInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
 
@@ -78,15 +81,15 @@ class FarthestPointsInit(AbstractInit):
             max_dist = 0
             ind = None
             for key in min_distance_keys:
-                dist = distances.get(key)[0]
+                dist = min_distances.get(key)
                 if dist > max_dist:
                     max_dist = dist
                     ind = key
 
             #Add the new index to the centroids
             centroids_indices.append(ind)
-            #print(max_dist)
-            #print(centroids_indices)
+            print(max_dist)
+            print(centroids_indices)
         return centroids_indices
 
 class PreClusterdSampleInit(AbstractInit):
