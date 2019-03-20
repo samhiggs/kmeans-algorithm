@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import math
+import time
 
 '''
 Implementation of different initialization strategies
@@ -16,9 +17,18 @@ class AbstractInit(ABC):
     def init(self, k_clusters, point_cloud):
         pass
 
+#Randomly initializes the k centroids for the cluster.
 class RandomInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
+        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed(seed)
+        centroids_indices = []
+        while len(centroids_indices) < k_clusters:
+            centroids_indices.append(np.random.randint(low=0, high=len(point_cloud) - 1))
+
+        print(centroids_indices)
+        return centroids_indices
         pass
 
 #See the following sources for description of the algorithm, particularly (1),(2)
@@ -31,9 +41,9 @@ class FarthestPointsInit(AbstractInit):
         centroids_indices = []
 
         #First pick a random point
-        np.random.seed(2019)
+        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed(seed)
         centroids_indices.append(np.random.randint(low = 0, high = len(point_cloud)-1))
-        a = []
 
         #While the number of centroids is smaller than the number of desired clusters
         while len(centroids_indices) < k_clusters:
