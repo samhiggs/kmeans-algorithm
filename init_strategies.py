@@ -11,7 +11,7 @@ using the strategy pattern.
 class AbstractInit(ABC):
 
     #Parameters: number of clusters, data set
-    #Return indices of initial cluster points
+    #Return a list containing the indices of initial cluster points
     @abstractmethod
     def init(self, k_clusters, point_cloud):
         pass
