@@ -37,7 +37,6 @@ class InitializationTests(unittest.TestCase):
         assert len(kmeans.clusters) == kmeans.k_clusters
 
     def test_cluster_create(self):
-
         pass
 
     def test_invalid_cluster(self):

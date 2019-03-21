@@ -22,6 +22,7 @@ class AbstractInit(ABC):
 class RandomInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
+        print('\n\nInitializing with Random Points Strategy')
         seed = int(time.clock_gettime(time.CLOCK_REALTIME))
         np.random.seed(seed)
         centroids_indices = []
@@ -39,7 +40,9 @@ class RandomInit(AbstractInit):
 #(2)https://larssonjohan.com/post/2016-10-30-farthest-points/
 #TODO: Improve defensive programming
 class FarthestPointsInit(AbstractInit):
+
     def init(self, k_clusters, point_cloud):
+        print('\n\nInitializing with Farthest Points Strategy')
 
         centroids_indices = []
 
