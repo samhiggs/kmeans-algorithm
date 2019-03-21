@@ -127,6 +127,9 @@ class KMeans:
         pass
 
     def visualise_clusters(self):
+
+        #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
+
         print('and in a nice pretty diagram!')
         #TODO
 
