@@ -13,9 +13,9 @@ class VisualizeTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         init_strategy = RandomInit()
-        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
         return kmeans
 
     def setup_csv(self):
@@ -23,13 +23,13 @@ class VisualizeTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         init_strategy = RandomInit()
-        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.clusters = kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
         return kmeans
 
     def test_visualise_three_test(self):
-        kmeans = self.setup_csv()
+        kmeans = self.setup_txt()
         kmeans.visualise_clusters()
         pass
 

@@ -34,7 +34,7 @@ class KMeans:
     def __init__(self, filename, k_clusters=0):
         self.filename = filename
         self.k_clusters = k_clusters
-        self.clusters = []
+        self.init_centroids = []
         self.optimized_clusters = {}
         self.raw_data = None
         self.point_cloud = []
@@ -141,14 +141,26 @@ class KMeans:
         #ax.plot3D(xline, yline, zline, 'gray')
 
         # Data for three-dimensional scattered points
-        keys = self.optimized_clusters.keys()
-        print(keys)
-        zdata = self.optimized_clusters
-        xdata = np.sin(zdata) + 0.1 * np.random.randn(100)
-        ydata = np.cos(zdata) + 0.1 * np.random.randn(100)
-        ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='Greens')
+        zdata = []
+        xdata = []
+        ydata = []
+        for i,key in enumerate(self.optimized_clusters.keys()):
+            zdata.clear()
+            xdata.clear()
+            ydata.clear()
+            for point in self.optimized_clusters[key][1]:
+                zdata.append(self.point_cloud[point][0])
+                ydata.append(self.point_cloud[point][1])
+                xdata.append(self.point_cloud[point][2])
+                #print(point)
+            #ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
+            if i == 0:
+                ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
+            if i == 1:
+                ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
+            if i == 2:
+                ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
         plt.show()
-
         pass
 
 

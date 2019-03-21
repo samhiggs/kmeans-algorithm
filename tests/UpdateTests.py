@@ -23,9 +23,11 @@ class UpdateTests(unittest.TestCase):
     def test_lloyd_update_random_init_csv(self):
         kmeans=self.setup_csv()
         init_strategy = RandomInit()
-        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        for key in kmeans.optimized_clusters.keys():
+            print(len(kmeans.optimized_clusters[key][1]))
         #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
         #assert len(kmeans.clusters) == kmeans.k_clusters
         pass
@@ -34,9 +36,35 @@ class UpdateTests(unittest.TestCase):
         kmeans=self.setup_csv()
         #init_strategy = RandomInit()
         init_strategy = FarthestPointsInit()
-        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        for key in kmeans.optimized_clusters.keys():
+            print(len(kmeans.optimized_clusters[key][1]))
+        #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
+        #assert len(kmeans.clusters) == kmeans.k_clusters
+        pass
+
+    def test_lloyd_update_random_init_txt(self):
+        kmeans=self.setup_txt()
+        init_strategy = RandomInit()
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.update_strategy = LloydUpdate()
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        for key in kmeans.optimized_clusters.keys():
+            print(len(kmeans.optimized_clusters[key][1]))
+        #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
+        #assert len(kmeans.clusters) == kmeans.k_clusters
+        pass
+
+    def test_lloyd_update_farthest_init_txt(self):
+        kmeans=self.setup_txt()
+        init_strategy = FarthestPointsInit()
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.update_strategy = LloydUpdate()
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        for key in kmeans.optimized_clusters.keys():
+            print(len(kmeans.optimized_clusters[key][1]))
         #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
         #assert len(kmeans.clusters) == kmeans.k_clusters
         pass
@@ -44,9 +72,9 @@ class UpdateTests(unittest.TestCase):
     def test_lloyd_update_pre_clusterd_sample_init_csv(self):
         kmeans=self.setup_csv()
         init_strategy = PreClusteredSampleInit()
-        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
+        kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
         #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
         #assert len(kmeans.clusters) == kmeans.k_clusters
         pass
