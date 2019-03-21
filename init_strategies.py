@@ -120,9 +120,8 @@ class PreClusteredSampleInit(AbstractInit):
                 if dup > 0:
                     break
                 clusters[j] = new_points
+            print('Iteration: {}'.format(i))
             if dup > 0:
-                print(dup)
-                print(i)
                 break
 
         for cluster in clusters:
