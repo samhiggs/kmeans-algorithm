@@ -15,29 +15,25 @@ class LloydUpdate(AbstractUpdate):
 
     def update(self, centroid_indices, point_cloud):
         print('\n\nUpdating with Lloyd Update Strategy')
+
         #Initialize cluster KV dictionary, centroids.
         clusters = {}
-        centroids = []
         for i in centroid_indices:
-            centroids.append(point_cloud[i])
+            #centroids.append(point_cloud[i])
+            clusters[i] = [point_cloud[i],[]]  # j = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
 
-        for j, centroid in enumerate(centroids):
-            clusters[j] = [centroid,[]] #j = cluster id, centroid is the clusters centroid, [] cointains the indices of the points of the cluster
-
-        modified = False
-
-        #print(centroids)
         iter = 0
-        while not modified:
+        modified = True
+        while modified:
             print('\n\nIteration: {}'.format(iter))
             iter += 1
+
             #Calculate new cluster
             for key in clusters.keys():
                 clusters[key][1]=[]
 
             for k, point_idx in enumerate(point_cloud):
                 min_dist = float("inf")
-                #for l, centroid in enumerate(centroids):
                 for key in clusters.keys():
                     dist = np.linalg.norm(clusters[key][0]- point_idx, ord=None)
                     if min_dist > dist:
@@ -45,17 +41,30 @@ class LloydUpdate(AbstractUpdate):
                         clusters[key][1].append(k)
 
             #Reposition Centroids
+            diff_centroids = []
             for key in clusters.keys():
                 avg = [0]*len(point_cloud[0])
                 for point_idx in clusters[key][1]:
                     avg += point_cloud[point_idx]
                 avg = (1/len(clusters[key][1]))*avg
                 print(avg)
+                diff_centroids.append(clusters[key][0] - avg)
                 clusters[key][0] = avg
 
+            #Check for abort condition:
+            epsilon = [10**-6]*len(point_cloud[0])
+            print('\nCentroids moved by: {}'.format(diff_centroids))
+            modified = False
+            for eps in epsilon:
+                for centroid in diff_centroids:
+                    for elem in centroid:
+                        if eps < elem:
+                            modified = True
+                            break
+                    if modified: break
+                if modified: break
+        return clusters
 
-        modified = True
-        print(clusters)
 class MacQueenUpdate(AbstractUpdate):
     def update(self, centroid_indices, point_cloud):
         pass

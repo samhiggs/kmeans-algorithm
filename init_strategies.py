@@ -3,6 +3,7 @@ import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import math
 import time
+import threading
 
 '''
 Implementation of different initialization strategies
@@ -23,8 +24,10 @@ class RandomInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
         print('\n\nInitializing with Random Points Strategy')
+
         seed = int(time.clock_gettime(time.CLOCK_REALTIME))
         np.random.seed(seed)
+        print(seed)
         centroids_indices = []
         while len(centroids_indices) < k_clusters:
             centroids_indices.append(np.random.randint(low=0, high=len(point_cloud) - 1))
@@ -46,7 +49,7 @@ class FarthestPointsInit(AbstractInit):
 
         centroids_indices = []
 
-        #First pick a random point
+        #First pick a random point.
         seed = int(time.clock_gettime(time.CLOCK_REALTIME))
         np.random.seed(seed)
         centroids_indices.append(np.random.randint(low = 0, high = len(point_cloud)-1))
