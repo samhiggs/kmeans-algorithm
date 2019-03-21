@@ -37,7 +37,7 @@ class RandomInit(AbstractInit):
 #(1)Page 17: http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf
 #(3)Page 3: https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf
 #(2)https://larssonjohan.com/post/2016-10-30-farthest-points/
-#TODO: Imporve defensive programming
+#TODO: Improve defensive programming
 class FarthestPointsInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
 
