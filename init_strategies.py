@@ -3,6 +3,8 @@ import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import math
 import time
+import operator
+import sys
 
 '''
 Implementation of different initialization strategies
@@ -75,7 +77,88 @@ class FarthestPointsInit(AbstractInit):
             centroids_indices.append(new_centroid_idx)
         return centroids_indices
 
-class PreClusterdSampleInit(AbstractInit):
+class PreClusteredSampleInit(AbstractInit):
     #http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf
     def init(self, k_clusters, point_cloud):
-        pass
+        centroids_indices = []
+        temp_centroids_indices = []
+        clusters = []
+        avg = 0
+        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed(seed)
+        avg_p = point_cloud[int(np.random.randint(low=0, high=len(point_cloud) - 1))]
+
+        for point in point_cloud:
+            avg += np.linalg.norm(avg_p-point, ord=None)
+
+        avg /= len(point_cloud)
+
+        step_size = avg/120
+
+        rounds = 20
+        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed(seed)
+        # First pick a random point
+        for i in range(0, k_clusters):
+            temp_centroids_indices.append(int(np.random.randint(low=0, high=len(point_cloud) - 1)))
+            clusters.append(list())
+
+
+        for i in range(1, rounds-1):
+            dup = 0
+            for j, centroid in enumerate(temp_centroids_indices):
+                new_points = self.points_in_range(centroid, point_cloud, step_size*i)
+                for k in range(0, len(temp_centroids_indices)):
+                    if k != j:
+                        dup += self.check_duplicates(new_points, clusters[k])
+                if dup > 0:
+                    break
+                clusters[j] = new_points
+            if dup > 0:
+                print(dup)
+                print(i)
+                break
+
+        for cluster in clusters:
+            centroids_indices.append(self.find_center(cluster, temp_centroids_indices, point_cloud))
+
+        return centroids_indices
+
+    pass
+
+
+    def points_in_range(self, centroid, point_cloud, step_size):
+        points_in_range = []
+        for i, point in enumerate(point_cloud):
+            if np.linalg.norm(point_cloud[centroid]-point, ord=None) <= step_size:
+                points_in_range.append(i)
+        return points_in_range
+
+    def check_duplicates(self, new_points, other_list):
+        dup = 0
+        for new_point in new_points:
+            for other_point in other_list:
+                if new_point == other_point:
+                    dup += 1
+
+        return dup
+
+
+    def find_center(self, cluster, centroids, point_cloud):
+        center = None
+        center_d = sys.maxsize
+        for point in cluster:
+            d_sum = 0
+            if centroids.count(point) != 0:
+                continue
+            for other_point in cluster:
+                d_sum += np.linalg.norm(point_cloud[other_point] - point_cloud[point], ord=None)
+
+            if d_sum < center_d:
+                center_d = d_sum
+                center = point
+
+        print('Center: {} und Distance_Sum: {}'.format(center, center_d))
+        return center
+
+
