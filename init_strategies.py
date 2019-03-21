@@ -54,7 +54,11 @@ class FarthestPointsInit(AbstractInit):
             #For each point that is not a centroid, find its distances to all centroids.
             #Out of these distances take the smallest and push into a KV dictionary.
             #Key = point index, Value = smallest distances to the centroids
+            #From the array of smallest distancees to any centroid, find the largest one.
+            #The point that has this largest distance will become the next centroid
             min_distances = {}
+            max_min_dist = 0
+            new_centroid_idx = None
             for point_idx in range(0, len(point_cloud)):
                 if not centroids_indices.__contains__(point_idx):
                     for centroid_idx in range(0, len(centroids_indices)):
@@ -64,23 +68,11 @@ class FarthestPointsInit(AbstractInit):
                                 min_distances[point_idx] = dist
                         else:
                             min_distances[point_idx] = dist
+                    if max_min_dist <min_distances.get(point_idx):
+                        max_min_dist = min_distances.get(point_idx)
+                        new_centroid_idx = point_idx
 
-
-            #From the array of smallest distancees to any centroid, find the largest one.
-            #The point that has this largest distance will become the next centroid
-            min_distance_keys = min_distances.keys()#min_distances.keys()
-            max_dist = 0
-            ind = None
-            for key in min_distance_keys:
-                dist = min_distances.get(key)#min_distances.get(key)
-                if dist > max_dist:
-                    max_dist = dist
-                    ind = key
-
-            #Add the new index to the centroids
-            centroids_indices.append(ind)
-            print(max_dist)
-            print(centroids_indices)
+            centroids_indices.append(new_centroid_idx)
         return centroids_indices
 
 class PreClusterdSampleInit(AbstractInit):
