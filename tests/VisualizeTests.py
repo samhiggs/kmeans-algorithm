@@ -9,19 +9,28 @@ from update_strategies import LloydUpdate
 class VisualizeTests(unittest.TestCase):
 
     def setup_txt(self):
-        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/Skin_NonSkin.txt', 3)
+        kmeans = KMeans('../data/Skin_NonSkin.txt', 3)
         kmeans.import_data()
         kmeans.convert_data()
+        init_strategy = RandomInit()
+        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.update_strategy = LloydUpdate()
+        kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
         return kmeans
 
     def setup_csv(self):
-        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/HTRU2/HTRU_2.csv', 3)
+        kmeans = KMeans('../data/HTRU2/HTRU_2.csv', 3)
         kmeans.import_data()
         kmeans.convert_data()
+        init_strategy = RandomInit()
+        kmeans.clusters = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.update_strategy = LloydUpdate()
+        kmeans.clusters = kmeans.update_strategy.update(kmeans.clusters, kmeans.point_cloud)
         return kmeans
 
-    def visualise_three_test(self):
-
+    def test_visualise_three_test(self):
+        kmeans = self.setup_csv()
+        kmeans.visualise_clusters()
         pass
 
     def visualise_ten_test(self):

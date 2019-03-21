@@ -7,13 +7,13 @@ from update_strategies import LloydUpdate
 class UpdateTests(unittest.TestCase):
 
     def setup_txt(self):
-        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/Skin_NonSkin.txt', 3)
+        kmeans = KMeans('../data/Skin_NonSkin.txt', 3)
         kmeans.import_data()
         kmeans.convert_data()
         return kmeans
 
     def setup_csv(self):
-        kmeans = KMeans('/home/lorenz/PycharmProjects/sdm_kmeans/data/HTRU2/HTRU_2.csv', 3)
+        kmeans = KMeans('../data/HTRU2/HTRU_2.csv', 3)
         kmeans.import_data()
         kmeans.convert_data()
         return kmeans
