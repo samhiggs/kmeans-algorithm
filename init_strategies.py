@@ -27,9 +27,9 @@ class RandomInit(AbstractInit):
     def init(self, k_clusters, point_cloud):
         print('\n\nInitializing with Random Points Strategy')
 
-        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
-        np.random.seed(seed)
-        print(seed)
+        #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed()
+        #print(seed)
         centroids_indices = []
         while len(centroids_indices) < k_clusters:
             centroids_indices.append(np.random.randint(low=0, high=len(point_cloud) - 1))
@@ -52,8 +52,8 @@ class FarthestPointsInit(AbstractInit):
         centroids_indices = []
 
         #First pick a random point.
-        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
-        np.random.seed(seed)
+        #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed()
         centroids_indices.append(np.random.randint(low = 0, high = len(point_cloud)-1))
 
         #While the number of centroids is smaller than the number of desired clusters
@@ -93,8 +93,8 @@ class PreClusteredSampleInit(AbstractInit):
         available = list()
         avg = 0
 
-        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
-        np.random.seed(seed)
+        #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed()
         avg_p = point_cloud[int(np.random.randint(low=0, high=len(point_cloud) - 1))]
 
         for i, point in enumerate(point_cloud):
@@ -105,8 +105,8 @@ class PreClusteredSampleInit(AbstractInit):
 
         step_size = (avg)/(rounds*k_clusters)
 
-        seed = int(time.clock_gettime(time.CLOCK_REALTIME))
-        np.random.seed(seed)
+        #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
+        np.random.seed()
         # First pick a random point
         for i in range(0, k_clusters):
             temp_centroids_indices.append(int(np.random.randint(low=0, high=len(point_cloud) - 1)))
