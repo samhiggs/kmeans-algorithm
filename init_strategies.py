@@ -86,11 +86,11 @@ class FarthestPointsInit(AbstractInit):
 class PreClusteredSampleInit(AbstractInit):
     #http://infolab.stanford.edu/%7Eullman/mmds/ch7.pdf
     def init(self, k_clusters, point_cloud):
-        rounds = 100
+        rounds = 10
         centroids_indices = []
         temp_centroids_indices = []
         clusters = []
-        available = list()
+        taken = list()
         avg = 0
 
         #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
@@ -99,11 +99,10 @@ class PreClusteredSampleInit(AbstractInit):
 
         for i, point in enumerate(point_cloud):
             avg += np.linalg.norm(avg_p-point, ord=None)
-            available.append(i)
 
         avg /= len(point_cloud)
 
-        step_size = (avg)/(rounds*k_clusters)
+        step_size = (avg)/(rounds*k_clusters*(len(point_cloud)/avg))
 
         #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
         np.random.seed()
@@ -116,7 +115,7 @@ class PreClusteredSampleInit(AbstractInit):
         end = False
         for i in range(1, rounds+1):
             for j, centroid in enumerate(temp_centroids_indices):
-                new_points, end = self.points_in_range(centroid, point_cloud, step_size*i, available, clusters[j])
+                new_points, end = self.points_in_range(centroid, point_cloud, step_size*i, taken, clusters[j])
                 if end:
                     break
                 clusters[j] += new_points
@@ -132,18 +131,18 @@ class PreClusteredSampleInit(AbstractInit):
     pass
 
 
-    def points_in_range(self, centroid, point_cloud, step_size, available, own_points):
+    def points_in_range(self, centroid, point_cloud, step_size, taken, own_points):
         points_in_range = []
         end = False
         for i, point in enumerate(point_cloud):
             if np.linalg.norm(point_cloud[centroid]-point, ord=None) <= step_size:
                 if i in own_points:
                     continue
-                if i not in available:
+                if i in taken:
                     end = True
                     return points_in_range, end
                 points_in_range.append(i)
-                available.remove(i)
+                taken.append(i)
         return points_in_range, end
 
 

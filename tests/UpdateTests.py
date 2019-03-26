@@ -69,8 +69,18 @@ class UpdateTests(unittest.TestCase):
         #assert len(kmeans.clusters) == kmeans.k_clusters
         pass
 
-    def test_lloyd_update_pre_clusterd_sample_init_csv(self):
+    def test_lloyd_update_pre_clustered_sample_init_csv(self):
         kmeans=self.setup_csv()
+        init_strategy = PreClusteredSampleInit()
+        kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
+        kmeans.update_strategy = LloydUpdate()
+        kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        #TODO: find assert condition. Maybe evaluate using the measure of compactness and quality of the clsuter from the slides
+        #assert len(kmeans.clusters) == kmeans.k_clusters
+        pass
+
+    def test_lloyd_update_pre_clustered_sample_init_txt(self):
+        kmeans=self.setup_txt()
         init_strategy = PreClusteredSampleInit()
         kmeans.init_centroids = init_strategy.init(k_clusters=3, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
