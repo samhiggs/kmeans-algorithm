@@ -34,11 +34,14 @@ class LloydUpdate(AbstractUpdate):
 
             for k, point_idx in enumerate(point_cloud):
                 min_dist = float("inf")
+                best_key = None
                 for key in clusters.keys():
                     dist = np.linalg.norm(clusters[key][0]- point_idx, ord=None)
                     if min_dist > dist:
                         min_dist = dist
-                        clusters[key][1].append(k)
+                        best_key = key
+
+                clusters[best_key][1].append(k)
 
             #Reposition Centroids
             diff_centroids = []

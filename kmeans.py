@@ -158,8 +158,9 @@ class KMeans:
                 ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
             if i == 1:
                 ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
-            if i == 2:
-                ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
+            #if i == 2:
+            #    ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
+            print(len(self.optimized_clusters[key][1]))
         plt.show()
         pass
 
