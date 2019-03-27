@@ -55,7 +55,7 @@ class LloydUpdate(AbstractUpdate):
 
             #Check for abort condition:
             epsilon = [10**-6]*len(point_cloud[0])
-            print('\nCentroids moved by: {}'.format(diff_centroids))
+            print('Centroids moved by: {}'.format(diff_centroids))
             modified = False
             for eps in epsilon:
                 for centroid in diff_centroids:

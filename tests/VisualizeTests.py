@@ -25,14 +25,16 @@ class VisualizeTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         init_strategy = PreClusteredSampleInit()
+        kmeans.transform_HTRU_data()
         kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
         return kmeans
 
-    def test_visualise_three_test(self):
+    def test_visualize_skin_noskin(self):
         kmeans = self.setup_txt()
-        kmeans.visualise_clusters()
+        kmeans.visualize_clusters_skin_noskin()
+        #No asserts, optical evaluation
         pass
 
     def visualise_ten_test(self):
