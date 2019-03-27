@@ -79,7 +79,7 @@ class KMeans:
         if self.point_cloud is None or len(self.raw_data) is 0:
             raise Exception('now raw data available, nothing to transform')
 
-        #Remove duplicates
+        #Remove duplicates -> screws NMI, dont know why yet
         #self.point_cloud = np.unique(self.point_cloud, axis=0)
 
         # Remove 4th elem
@@ -90,7 +90,7 @@ class KMeans:
         self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
 
-    def visualise_clusters(self):
+    def visualize_clusters_skin_noskin(self):
 
         #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
 
@@ -135,7 +135,7 @@ class KMeans:
                     pred.append(1)
                 else:
                     pred.append(0)
-        print(metrics.cluster.normalized_mutual_info_score(true, pred))
+        return metrics.cluster.normalized_mutual_info_score(true, pred)
 
     #summary of data
     def dataSummary(self):
@@ -202,5 +202,5 @@ if __name__ == '__main__':
     kmeans.initial_observations()
     kmeans.recursive_observations()
     kmeans.print_clusters()
-    kmeans.visualise_clusters()
+    kmeans.visualize_clusters_skin_noskin()
         

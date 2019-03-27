@@ -30,10 +30,10 @@ class VisualizeTests(unittest.TestCase):
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
         return kmeans
 
-    def test_visualise_three_test(self):
+    def test_visualize_skin_noskin(self):
         kmeans = self.setup_txt()
-        kmeans.visualise_clusters()
-        kmeans.calc_nmi_skin_noskin_data()
+        kmeans.visualize_clusters_skin_noskin()
+        #No asserts, optical evaluation
         pass
 
     def visualise_ten_test(self):
