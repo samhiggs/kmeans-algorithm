@@ -89,6 +89,19 @@ class KMeans:
         #Normalize data
         self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
+    def transform_HTRU_data(self):
+        if self.point_cloud is None or len(self.raw_data) is 0:
+            raise Exception('now raw data available, nothing to transform')
+
+        #Remove duplicates -> screws NMI, dont know why yet
+        #self.point_cloud = np.unique(self.point_cloud, axis=0)
+
+        # Remove 8th elem
+        for i, point in enumerate(self.point_cloud):
+            self.transformed_point_cloud.append(self.point_cloud[i][:8])
+
+        #Normalize data
+        self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
     def visualize_clusters_skin_noskin(self):
 
@@ -124,6 +137,23 @@ class KMeans:
         true = []
         for i, point in enumerate(self.point_cloud):
             if point[3] == 1:
+                true.append(1)
+            else:
+                true.append(0)
+
+        pred = []
+        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
+            for i, point in enumerate(self.optimized_clusters[key][1]):
+                if cluster_no == 1:
+                    pred.append(1)
+                else:
+                    pred.append(0)
+        return metrics.cluster.normalized_mutual_info_score(true, pred)
+
+    def calc_nmi_HTRU_data(self):
+        true = []
+        for i, point in enumerate(self.point_cloud):
+            if point[8] == 1:
                 true.append(1)
             else:
                 true.append(0)

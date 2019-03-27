@@ -29,6 +29,7 @@ class AccuracyTests(unittest.TestCase):
         kmeans = KMeans('../data/HTRU2/HTRU_2.csv', 2)
         kmeans.import_data()
         kmeans.convert_data()
+        kmeans.transform_HTRU_data()
         init_strategy = PreClusteredSampleInit()
         kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
@@ -38,6 +39,13 @@ class AccuracyTests(unittest.TestCase):
     def test_nmi_skin_noskin(self):
         kmeans = self.setup_txt()
         nmi = kmeans.calc_nmi_skin_noskin_data()
+        #print(nmi)
+        assert nmi is not None
+        pass
+
+    def test_nmi_HTRU(self):
+        kmeans = self.setup_csv()
+        nmi = kmeans.calc_nmi_HTRU_data()
         print(nmi)
         assert nmi is not None
         pass
