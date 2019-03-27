@@ -131,7 +131,7 @@ class KMeans:
         pred = []
         for cluster_no, key in enumerate(self.optimized_clusters.keys()):
             for i, point in enumerate(self.optimized_clusters[key][1]):
-                if cluster_no == 0:
+                if cluster_no == 1:
                     pred.append(1)
                 else:
                     pred.append(0)

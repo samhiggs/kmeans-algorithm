@@ -19,7 +19,7 @@ class AccuracyTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         kmeans.transform_skin_noskin_data()
-        init_strategy = PreClusteredSampleInit()
+        init_strategy = FarthestPointsInit()
         kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.transformed_point_cloud)
         kmeans.update_strategy = LloydUpdate()
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.transformed_point_cloud)
