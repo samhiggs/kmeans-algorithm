@@ -86,8 +86,8 @@ class KMeans:
         for i, point in enumerate(self.point_cloud):
             self.transformed_point_cloud.append(self.point_cloud[i][:3])
 
-        #Normalize data
-        self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
+        #Normalize data -> screws WSCC
+        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
     def transform_HTRU_data(self):
         if self.point_cloud is None or len(self.raw_data) is 0:
@@ -100,8 +100,8 @@ class KMeans:
         for i, point in enumerate(self.point_cloud):
             self.transformed_point_cloud.append(self.point_cloud[i][:8])
 
-        #Normalize data
-        self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
+        #Normalize data -> screws WSCC
+        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
     def visualize_clusters_skin_noskin(self):
 
@@ -154,7 +154,7 @@ class KMeans:
     def calc_nmi_HTRU_data(self):
         true = []
         for i, point in enumerate(self.point_cloud):
-            if point[8] == 1:
+            if point[8] == 0:
                 true.append(1)
             else:
                 true.append(0)
@@ -167,6 +167,15 @@ class KMeans:
                 else:
                     pred.append(0)
         return metrics.cluster.normalized_mutual_info_score(true, pred)
+
+    def calc_wcss(self):
+        wscc = 0.0
+        for key in self.optimized_clusters.keys():
+            centroid = self.optimized_clusters[key][0]
+            for point_idx in self.optimized_clusters[key][1]:
+                wscc += np.power(np.linalg.norm(centroid - self.transformed_point_cloud[point_idx], ord=None),2)
+        return wscc
+
 
     #summary of data
     def dataSummary(self):

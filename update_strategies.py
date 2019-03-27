@@ -4,7 +4,7 @@ import numpy as np #useful for data analysis
 class AbstractUpdate(ABC):
 
     #Receives self, # of clusters, list of indices of initial centroids, and point cloud as parameters
-    #Returns a list of lists containing the indices of the points in the point cloud.
+    #Returns a KV dict containing the centroid_id as key, the centroids and the an array of point indices as values
     def update(self, centroids, point_cloud):
         pass
 
@@ -19,13 +19,12 @@ class LloydUpdate(AbstractUpdate):
         #Initialize cluster KV dictionary, centroids.
         clusters = {}
         for i in centroid_indices:
-            #centroids.append(point_cloud[i])
-            clusters[i] = [point_cloud[i],[]]  # j = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
+            clusters[i] = [point_cloud[i],[]]  # i = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
 
         iter = 0
         modified = True
         while modified:
-            print('\n\nIteration: {}'.format(iter))
+            print('\nIteration: {}'.format(iter))
             iter += 1
 
             #Calculate new cluster
@@ -54,16 +53,14 @@ class LloydUpdate(AbstractUpdate):
                 clusters[key][0] = avg
 
             #Check for abort condition:
-            epsilon = [10**-6]*len(point_cloud[0])
+            eps = 10**-6
             print('Centroids moved by: {}'.format(diff_centroids))
             modified = False
-            for eps in epsilon:
-                for centroid in diff_centroids:
-                    for elem in centroid:
-                        if eps < elem:
-                            modified = True
-                            break
-                    if modified: break
+            for centroid in diff_centroids:
+                for elem in centroid:
+                    if eps < np.linalg.norm(elem):
+                        modified = True
+                        break
                 if modified: break
         return clusters
 
