@@ -33,6 +33,7 @@ class VisualizeTests(unittest.TestCase):
     def test_visualise_three_test(self):
         kmeans = self.setup_txt()
         kmeans.visualise_clusters()
+        kmeans.calc_nmi_skin_noskin_data()
         pass
 
     def visualise_ten_test(self):

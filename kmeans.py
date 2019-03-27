@@ -19,6 +19,7 @@ import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
+from sklearn import metrics
 
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
@@ -79,7 +80,7 @@ class KMeans:
             raise Exception('now raw data available, nothing to transform')
 
         #Remove duplicates
-        self.point_cloud = np.unique(self.point_cloud, axis=0)
+        #self.point_cloud = np.unique(self.point_cloud, axis=0)
 
         # Remove 4th elem
         for i, point in enumerate(self.point_cloud):
@@ -105,9 +106,9 @@ class KMeans:
             xdata.clear()
             ydata.clear()
             for point in self.optimized_clusters[key][1]:
-                zdata.append(self.point_cloud[point][0])
+                zdata.append(self.point_cloud[point][2])
                 ydata.append(self.point_cloud[point][1])
-                xdata.append(self.point_cloud[point][2])
+                xdata.append(self.point_cloud[point][0])
 
             if i == 0:
                 ax.scatter3D(xdata, ydata, zdata, c='r', marker='1')
@@ -119,7 +120,22 @@ class KMeans:
         plt.show()
         pass
 
+    def calc_nmi_skin_noskin_data(self):
+        true = []
+        for i, point in enumerate(self.point_cloud):
+            if point[3] == 1:
+                true.append(1)
+            else:
+                true.append(0)
 
+        pred = []
+        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
+            for i, point in enumerate(self.optimized_clusters[key][1]):
+                if cluster_no == 0:
+                    pred.append(1)
+                else:
+                    pred.append(0)
+        print(metrics.cluster.normalized_mutual_info_score(true, pred))
 
     #summary of data
     def dataSummary(self):
