@@ -40,7 +40,6 @@ class LloydUpdate(AbstractUpdate):
                     if min_dist > dist:
                         min_dist = dist
                         best_key = key
-
                 clusters[best_key][1].append(k)
 
             #Reposition Centroids

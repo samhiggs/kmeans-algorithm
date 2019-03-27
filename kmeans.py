@@ -18,6 +18,7 @@ import numpy as np #useful for data analysis
 import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
 from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
 
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
@@ -38,6 +39,7 @@ class KMeans:
         self.optimized_clusters = {}
         self.raw_data = None
         self.point_cloud = []
+        self.transformed_point_cloud = []
         self.training_set = None
         self.test_set = None
         self.init_strategy = None
@@ -71,9 +73,54 @@ class KMeans:
             i+=1
             self.point_cloud.append(point)
 
-    # converts data from csv (N columns) to nparray of points point cloud.
 
-    #def outputTest
+    def transform_skin_noskin_data(self):
+        if self.point_cloud is None or len(self.raw_data) is 0:
+            raise Exception('now raw data available, nothing to transform')
+
+        #Remove duplicates
+        self.point_cloud = np.unique(self.point_cloud, axis=0)
+
+        # Remove 4th elem
+        for i, point in enumerate(self.point_cloud):
+            self.transformed_point_cloud.append(self.point_cloud[i][:3])
+
+        #Normalize data
+        self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
+
+
+    def visualise_clusters(self):
+
+        #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
+
+        ax = plt.axes(projection='3d')
+
+        # Data for three-dimensional scattered points
+        zdata = []
+        xdata = []
+        ydata = []
+        #self.point_cloud = np.arccosh(self.point_cloud)
+        for i,key in enumerate(self.optimized_clusters.keys()):
+            zdata.clear()
+            xdata.clear()
+            ydata.clear()
+            for point in self.optimized_clusters[key][1]:
+                zdata.append(self.point_cloud[point][0])
+                ydata.append(self.point_cloud[point][1])
+                xdata.append(self.point_cloud[point][2])
+
+            if i == 0:
+                ax.scatter3D(xdata, ydata, zdata, c='r', marker='1')
+            if i == 1:
+                ax.scatter3D(xdata, ydata, zdata, c='b', marker='2')
+            if i == 2:
+                ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
+            print(len(self.optimized_clusters[key][1]))
+        plt.show()
+        pass
+
+
+
     #summary of data
     def dataSummary(self):
         #TODO
@@ -127,42 +174,6 @@ class KMeans:
         #TODO
         pass
 
-    def visualise_clusters(self):
-
-        #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
-        #TODO
-
-        ax = plt.axes(projection='3d')
-
-        # Data for a three-dimensional line
-        #zline = np.linspace(0, 15, 1000)
-        #xline = np.sin(zline)
-        #yline = np.cos(zline)
-        #ax.plot3D(xline, yline, zline, 'gray')
-
-        # Data for three-dimensional scattered points
-        zdata = []
-        xdata = []
-        ydata = []
-        for i,key in enumerate(self.optimized_clusters.keys()):
-            zdata.clear()
-            xdata.clear()
-            ydata.clear()
-            for point in self.optimized_clusters[key][1]:
-                zdata.append(self.point_cloud[point][0])
-                ydata.append(self.point_cloud[point][1])
-                xdata.append(self.point_cloud[point][2])
-                #print(point)
-            #ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
-            if i == 0:
-                ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
-            if i == 1:
-                ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
-            #if i == 2:
-            #    ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
-            print(len(self.optimized_clusters[key][1]))
-        plt.show()
-        pass
 
 
 #If we want to run as a script using some test data
