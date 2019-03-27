@@ -15,4 +15,7 @@ setuptools.setup(
     classifiers=['Programming Language :: Python :: 3.7'],
     py_modules=["kmeans"],
     python_requires='>=3.0',
+    packages=setuptools.find_packages(),
+    setup_requires=['pytest-runner'],
+    test_requires=['pytest']
 )

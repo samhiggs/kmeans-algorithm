@@ -10,7 +10,7 @@ from update_strategies import LloydUpdate
 class VisualizeTests(unittest.TestCase):
 
     def setup_txt(self):
-        kmeans = KMeans('data/Skin_NonSkin.txt', 2)
+        kmeans = KMeans('../data/Skin_NonSkin.txt', 2)
         kmeans.import_data()
         kmeans.convert_data()
         kmeans.transform_skin_noskin_data()
@@ -21,7 +21,7 @@ class VisualizeTests(unittest.TestCase):
         return kmeans
 
     def setup_csv(self):
-        kmeans = KMeans('data/HTRU2/HTRU_2.csv', 2)
+        kmeans = KMeans('../data/HTRU2/HTRU_2.csv', 2)
         kmeans.import_data()
         kmeans.convert_data()
         init_strategy = PreClusteredSampleInit()

@@ -69,4 +69,5 @@ class LloydUpdate(AbstractUpdate):
 
 class MacQueenUpdate(AbstractUpdate):
     def update(self, centroid_indices, point_cloud):
+        print('updatings using MacQueens Update Method')
         pass
