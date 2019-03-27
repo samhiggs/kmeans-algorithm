@@ -19,7 +19,6 @@ import pandas as pd #useful for importing files and handling dataframes.
 import sklearn as skl #useful for initial analysis
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
-from sklearn import metrics
 
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
@@ -79,31 +78,18 @@ class KMeans:
         if self.point_cloud is None or len(self.raw_data) is 0:
             raise Exception('now raw data available, nothing to transform')
 
-        #Remove duplicates -> screws NMI, dont know why yet
-        #self.point_cloud = np.unique(self.point_cloud, axis=0)
+        #Remove duplicates
+        self.point_cloud = np.unique(self.point_cloud, axis=0)
 
         # Remove 4th elem
         for i, point in enumerate(self.point_cloud):
             self.transformed_point_cloud.append(self.point_cloud[i][:3])
 
-        #Normalize data -> screws WSCC
-        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
+        #Normalize data
+        self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
 
-    def transform_HTRU_data(self):
-        if self.point_cloud is None or len(self.raw_data) is 0:
-            raise Exception('now raw data available, nothing to transform')
 
-        #Remove duplicates -> screws NMI, dont know why yet
-        #self.point_cloud = np.unique(self.point_cloud, axis=0)
-
-        # Remove 8th elem
-        for i, point in enumerate(self.point_cloud):
-            self.transformed_point_cloud.append(self.point_cloud[i][:8])
-
-        #Normalize data -> screws WSCC
-        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
-
-    def visualize_clusters_skin_noskin(self):
+    def visualise_clusters(self):
 
         #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
 
@@ -119,62 +105,20 @@ class KMeans:
             xdata.clear()
             ydata.clear()
             for point in self.optimized_clusters[key][1]:
-                zdata.append(self.point_cloud[point][2])
+                zdata.append(self.point_cloud[point][0])
                 ydata.append(self.point_cloud[point][1])
-                xdata.append(self.point_cloud[point][0])
+                xdata.append(self.point_cloud[point][2])
 
             if i == 0:
-                ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
+                ax.scatter3D(xdata, ydata, zdata, c='r', marker='1')
             if i == 1:
-                ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
+                ax.scatter3D(xdata, ydata, zdata, c='b', marker='2')
             if i == 2:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
             print(len(self.optimized_clusters[key][1]))
-
         plt.show()
         pass
 
-    def calc_nmi_skin_noskin_data(self):
-        true = []
-        for i, point in enumerate(self.point_cloud):
-            if point[3] == 1:
-                true.append(1)
-            else:
-                true.append(0)
-
-        pred = []
-        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, _ in enumerate(self.optimized_clusters[key][1]):
-                if cluster_no == 1:
-                    pred.append(1)
-                else:
-                    pred.append(0)
-        return metrics.cluster.normalized_mutual_info_score(true, pred)
-
-    def calc_nmi_HTRU_data(self):
-        true = []
-        for i, point in enumerate(self.point_cloud):
-            if point[8] == 0:
-                true.append(1)
-            else:
-                true.append(0)
-
-        pred = []
-        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, _ in enumerate(self.optimized_clusters[key][1]):
-                if cluster_no == 1:
-                    pred.append(1)
-                else:
-                    pred.append(0)
-        return metrics.cluster.normalized_mutual_info_score(true, pred)
-
-    def calc_wcss(self):
-        wscc = 0.0
-        for key in self.optimized_clusters.keys():
-            centroid = self.optimized_clusters[key][0]
-            for point_idx in self.optimized_clusters[key][1]:
-                wscc += np.power(np.linalg.norm(centroid - self.transformed_point_cloud[point_idx], ord=None),2)
-        return wscc
 
 
     #summary of data
@@ -242,5 +186,5 @@ if __name__ == '__main__':
     kmeans.initial_observations()
     kmeans.recursive_observations()
     kmeans.print_clusters()
-    kmeans.visualize_clusters_skin_noskin()
+    kmeans.visualise_clusters()
         

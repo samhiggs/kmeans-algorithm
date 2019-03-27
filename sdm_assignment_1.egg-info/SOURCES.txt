@@ -5,3 +5,12 @@ sdm_assignment_1.egg-info/PKG-INFO
 sdm_assignment_1.egg-info/SOURCES.txt
 sdm_assignment_1.egg-info/dependency_links.txt
 sdm_assignment_1.egg-info/top_level.txt
+tests/AccuracyTests.py
+tests/InitializationTests.py
+tests/ObservationTests.py
+tests/PrepareDataTests.py
+tests/PrintClusterTest.py
+tests/RecursionTests.py
+tests/UpdateTests.py
+tests/VisualizeTests.py
+tests/__init__.py
