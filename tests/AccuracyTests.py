@@ -39,8 +39,9 @@ class AccuracyTests(unittest.TestCase):
     def test_nmi_skin_noskin(self):
         kmeans = self.setup_txt()
         nmi = kmeans.calc_nmi_skin_noskin_data()
-        #print(nmi)
         assert nmi is not None
+        assert nmi <= 1.0
+        assert nmi >= 0.0
         pass
 
     def test_nmi_HTRU(self):
@@ -48,4 +49,6 @@ class AccuracyTests(unittest.TestCase):
         nmi = kmeans.calc_nmi_HTRU_data()
         print(nmi)
         assert nmi is not None
+        assert nmi <= 1.0
+        assert nmi >= 0.0
         pass

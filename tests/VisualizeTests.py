@@ -25,6 +25,7 @@ class VisualizeTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         init_strategy = PreClusteredSampleInit()
+        kmeans.transform_HTRU_data()
         kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.point_cloud)
         kmeans.update_strategy = LloydUpdate()
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)

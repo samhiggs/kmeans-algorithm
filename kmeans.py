@@ -124,12 +124,13 @@ class KMeans:
                 xdata.append(self.point_cloud[point][0])
 
             if i == 0:
-                ax.scatter3D(xdata, ydata, zdata, c='r', marker='1')
+                ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
             if i == 1:
-                ax.scatter3D(xdata, ydata, zdata, c='b', marker='2')
+                ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
             if i == 2:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
             print(len(self.optimized_clusters[key][1]))
+
         plt.show()
         pass
 
@@ -143,7 +144,7 @@ class KMeans:
 
         pred = []
         for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, point in enumerate(self.optimized_clusters[key][1]):
+            for i, _ in enumerate(self.optimized_clusters[key][1]):
                 if cluster_no == 1:
                     pred.append(1)
                 else:
@@ -160,7 +161,7 @@ class KMeans:
 
         pred = []
         for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, point in enumerate(self.optimized_clusters[key][1]):
+            for i, _ in enumerate(self.optimized_clusters[key][1]):
                 if cluster_no == 1:
                     pred.append(1)
                 else:
