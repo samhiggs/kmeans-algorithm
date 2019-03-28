@@ -1,6 +1,7 @@
 import kmeans
 import time
 import numpy as np
+from multiprocessing import Pool
 from kmeans import KMeans
 from init_strategies import FarthestPointsInit
 from init_strategies import PreClusteredSampleInit
@@ -158,6 +159,15 @@ def HTRUPreClusteredSampleInitMacQueenUpdate():
     return kmeans.calc_nmi_HTRU_data(), kmeans.calc_wcss()
 
 
+def benchmark(strategiesList, timeDataRecords, strategyType, iterations):
+    startTime = time.perf_counter()
+    nmi, wcss = strategiesList[strategyType]()
+    resultTime = time.perf_counter() - startTime
+    timeDataRecords[strategyType, 0, iterations] = nmi
+    timeDataRecords[strategyType, 1, iterations] = wcss
+    timeDataRecords[strategyType, 2, iterations] = resultTime
+
+
 if __name__ == '__main__':
     strategiesList = [SkinRandomInitLloydUpdate, HTRURandomInitLloydUpdate,
                       SkinFarthestPointsInitLloydUpdate, HTRUFarthestPointsInitLloydUpdate,
@@ -167,15 +177,18 @@ if __name__ == '__main__':
                      # SkinFarthestPointsInitMacQueenUpdate, HTRUFarthestPointsInitMacQueenUpdate,
                      # SkinPreClusteredSampleInitMacQueenUpdate, HTRUPreClusteredSampleInitMacQueenUpdate]
 
-    timeDataRecords = np.zeros((6, 3, 100))
-    for strategyType in range(6):
-        for iterations in range(1):
-            startTime = time.perf_counter()
-            nmi, wcss = strategiesList[strategyType]()
-            resultTime = time.perf_counter() - startTime
-            timeDataRecords[strategyType, 0, iterations] = nmi
-            timeDataRecords[strategyType, 1, iterations] = wcss
-            timeDataRecords[strategyType, 2, iterations] = resultTime
+    timeDataRecords = np.zeros((6, 3, 3))
+
+    with Pool() as pool:
+        for strategyType in range(6):
+            for iterations in range(3):
+                pool.apply(benchmark, args=(strategiesList, timeDataRecords, strategyType, iterations))
+
+
+
+    pass
+
+
 
     result = np.zeros((6, 3))
     for strategyType in range(6):
