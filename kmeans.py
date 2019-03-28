@@ -21,11 +21,17 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn import metrics
 
+from init_strategies import PreClusteredSampleInit, FarthestPointsInit, RandomInit
+from update_strategies import LloydUpdate, MacQueenUpdate
+
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
 from matplotlib import pyplot as plt #useful for visualising data
 import abc
-
+import sys
+import configparser as cp
+import hashlib
+import itertools
 
 from mpl_toolkits import mplot3d
 
@@ -33,78 +39,43 @@ import os
 
 class KMeans:
     
-    def __init__(self, filename, k_clusters=0):
+    def __init__(self, filename='', k_clusters=0, strategies=None, dataset=None):
         self.filename = filename
         self.k_clusters = k_clusters
         self.init_centroids = []
         self.optimized_clusters = {}
-        self.raw_data = None
-        self.point_cloud = []
-        self.transformed_point_cloud = []
+        self.raw_data = dataset
+        self.processed_data = dataset
+        self.true_result_dict = None
         self.training_set = None
         self.test_set = None
         self.init_strategy = None
         self.update_strategy = None
-
+        self.function_map = {
+            'RandomInit': RandomInit,
+            'FarthestPointsInit': FarthestPointsInit,
+            'PreClusteredSampleInit' : PreClusteredSampleInit,
+            'MacQueenUpdate': MacQueenUpdate,
+            'LloydUpdate': LloydUpdate
+        }
     #imports raw data and checks that it is a valid filetype.
     def import_data(self):
         print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
         filename, ftype = os.path.splitext(self.filename)
         if ftype == '.csv':
-            self.raw_data = pd.read_csv(self.filename, header=None)
-            return
-        if ftype == '.txt':
-            self.raw_data = pd.read_csv(self.filename, sep="\t", header=None)
-            return
+            self.raw_data = np.genfromtxt(self.filename, delimiter=',', dtype=float, usecols=(0,1,2,3,4,5,6,7,8))
+        elif ftype == '.txt':
+            self.raw_data = np.genfromtxt(self.filename, delimiter="\t", dtype=int, usecols=(0,1,2,3))
         else:
             print('{} is an invalid filetype'.format(ftype))
-            return
-
-    # converts data from tsv (N columns) to nparray of points point cloud.
-    def convert_data(self):
-        if self.point_cloud is None or len(self.raw_data) is 0:
-            raise Exception('now raw data available, nothing to convert')
-        i = 0
-        while i < len(self.raw_data):
-            point = []
-            for j in range(0, len(self.raw_data.columns)):
-                point.append(self.raw_data[j][i])
-            point = np.array(point)
-            i+=1
-            self.point_cloud.append(point)
-
-
-    def transform_skin_noskin_data(self):
-        if self.point_cloud is None or len(self.raw_data) is 0:
-            raise Exception('now raw data available, nothing to transform')
-
         #Remove duplicates -> screws NMI, dont know why yet
-        #self.point_cloud = np.unique(self.point_cloud, axis=0)
-
-        # Remove 4th elem
-        for i, point in enumerate(self.point_cloud):
-            self.transformed_point_cloud.append(self.point_cloud[i][:3])
-
+        #self.data = np.unique(self.data, axis=0)
         #Normalize data -> screws WSCC
-        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
-
-    def transform_HTRU_data(self):
-        if self.point_cloud is None or len(self.raw_data) is 0:
-            raise Exception('now raw data available, nothing to transform')
-
-        #Remove duplicates -> screws NMI, dont know why yet
-        #self.point_cloud = np.unique(self.point_cloud, axis=0)
-
-        # Remove 8th elem
-        for i, point in enumerate(self.point_cloud):
-            self.transformed_point_cloud.append(self.point_cloud[i][:8])
-
-        #Normalize data -> screws WSCC
-        #self.transformed_point_cloud = preprocessing.normalize(self.transformed_point_cloud)
-
+        #self.transformed_data = preprocessing.normalize(self.transformed_data)
+        self.processed_data = self.raw_data[:,:-1]
+        
     def visualize_clusters_skin_noskin(self):
-
         #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
 
         ax = plt.axes(projection='3d')
@@ -113,15 +84,15 @@ class KMeans:
         zdata = []
         xdata = []
         ydata = []
-        #self.point_cloud = np.arccosh(self.point_cloud)
+        #self.data = np.arccosh(self.data)
         for i,key in enumerate(self.optimized_clusters.keys()):
             zdata.clear()
             xdata.clear()
             ydata.clear()
             for point in self.optimized_clusters[key][1]:
-                zdata.append(self.point_cloud[point][2])
-                ydata.append(self.point_cloud[point][1])
-                xdata.append(self.point_cloud[point][0])
+                zdata.append(self.raw_data[point][2])
+                ydata.append(self.raw_data[point][1])
+                xdata.append(self.raw_data[point][0])
 
             if i == 0:
                 ax.scatter3D(xdata, ydata, zdata, c='r', marker='.')
@@ -130,60 +101,54 @@ class KMeans:
             if i == 2:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
             print(len(self.optimized_clusters[key][1]))
-
         plt.show()
-        pass
 
-    def calc_nmi_skin_noskin_data(self):
-        true = []
-        for i, point in enumerate(self.point_cloud):
-            if point[3] == 1:
-                true.append(1)
+    def process_true_data(self):
+        true_data_dict = {}
+        result_col = np.shape(self.raw_data)[1]
+        for idx in range(len(self.raw_data)):
+            result = self.raw_data[result_col]
+            if result not in true_data_dict:
+                true_data_dict[result] = [idx]
             else:
-                true.append(0)
+                true_data_dict[result].append(idx)
+        self.true_result_dict = true_data_dict
 
-        pred = []
-        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, _ in enumerate(self.optimized_clusters[key][1]):
-                if cluster_no == 1:
-                    pred.append(1)
-                else:
-                    pred.append(0)
-        return metrics.cluster.normalized_mutual_info_score(true, pred)
+    #Need the number of results. 
+    def nmi_comparison(self):
+        if self.true_result_dict is None:
+            self.process_true_data()
 
-    def calc_nmi_HTRU_data(self):
-        true = []
-        for i, point in enumerate(self.point_cloud):
-            if point[8] == 0:
-                true.append(1)
-            else:
-                true.append(0)
-
-        pred = []
-        for cluster_no, key in enumerate(self.optimized_clusters.keys()):
-            for i, _ in enumerate(self.optimized_clusters[key][1]):
-                if cluster_no == 1:
-                    pred.append(1)
-                else:
-                    pred.append(0)
-        return metrics.cluster.normalized_mutual_info_score(true, pred)
+        if(len(self.optimized_clusters.keys()) != len(self.true_result_dict)):
+            print('The clusters or results have not been processed correctly.'\
+                'There are {} model results and {} true results'
+                .format(len(self.optimized_clusters.keys()), len(self.true_result_dict)))
+            return
+        #normalised scores per cluster
+        normalised_scores = {}
+        for cluster in self.true_result_dict.keys():
+            normalised_scores[cluster] = metrics.cluster.normalized_mutual_info_score(
+                        self.true_result_dict[cluster], 
+                        self.optimized_clusters[cluster]
+                    )
+        return normalised_scores
 
     def calc_wcss(self):
         wscc = 0.0
         for key in self.optimized_clusters.keys():
             centroid = self.optimized_clusters[key][0]
             for point_idx in self.optimized_clusters[key][1]:
-                wscc += np.power(np.linalg.norm(centroid - self.transformed_point_cloud[point_idx], ord=None),2)
+                wscc += np.power(np.linalg.norm(centroid - self.data[point_idx], ord=None),2)
         return wscc
 
 
     #summary of data
     def dataSummary(self):
         #TODO
-        if self.point_cloud is None or len(self.point_cloud) is 0:
-            print('the data has not been created in dataSummary()')
+        if self.raw_data is None or len(self.raw_data) is 0:
+            print('the raw_data has not been created in raw_dataSummary()')
             return False
-        print('{}\n {}\n {}\n {}\n'.format(self.point_cloud, self.point_cloud.info(), self.point_cloud.describe(), self.point_cloud.columns))
+        print('{}\n {}\n {}\n {}\n'.format(self.raw_data, self.raw_data.info(), self.raw_data.describe(), self.data.columns))
         if self.k_clusters == 0:
             #TODO
             pass
@@ -202,7 +167,7 @@ class KMeans:
             print('ratio must be as a float between 0.0 and 1.0')
             return False
         print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
-        self.training_set, self.test_set = train_test_split(self.point_cloud, ratio)
+        self.training_set, self.test_set = train_test_split(self.data, ratio)
         if self.training_set is not None and self.test_set is not None:
             return True
         return False
@@ -234,13 +199,56 @@ class KMeans:
 
 #If we want to run as a script using some test data
 if __name__ == '__main__':
-    kmeans = KMeans('data/Skin_NonSkin.txt')
-    kmeans.import_data()
-    kmeans.convert_data()
-    kmeans.dataSummary()
-    kmeans.initialise_clusters()
-    kmeans.initial_observations()
-    kmeans.recursive_observations()
-    kmeans.print_clusters()
-    kmeans.visualize_clusters_skin_noskin()
+    cf = cp.ConfigParser()
+    try:
+        cf.read('config_files/options.ini')
+    except:
+        print('couldnt read config file')
+        exit()
+
+    if cf.sections() == 0:
+        print('config is empty')
+        exit()
+
+    #Get data from parser    
+    data_dir = cf['PATHS']['data_dir']
+    datasets = [(cf['DATASETS'][key]).split() for key in cf['DATASETS']]
+    init_strategies = cf['STRATEGIES']['init_strategies'].split()
+    update_strategies = cf['STRATEGIES']['update_strategies'].split()
+
+    #clean the path and create an extension
+    [d.append(os.path.splitext(d[0])[1]) for d in datasets]
+    #Make sure it all looks good
+    # print(data_dir, datasets, init_strategies, update_strategies)
+    
+    #Check dataset can be found, if not remove it.
+    for dataset in datasets:
+        exists = os.path.isfile(data_dir+'/'+dataset[0])
+        if not exists or len(dataset) != 3:
+            print(dataset, ' cannot be found')
+            datasets.remove(dataset)
+        try:
+            dataset[1] = int(dataset[1])
+        except:
+            datasets.remove(dataset)
+
+    if len(datasets) == 0:
+        print('No datasets can be found')
+        exit()
+    s_combinations = [(i,j) for j in update_strategies for i in init_strategies]
+    kmeans_instances = {}
+    for i,dataset in enumerate(datasets):
+        kmeans = KMeans(data_dir+'/'+dataset[0], dataset[1])
+        kmeans.import_data()
+        kmeans.init_strategy = kmeans.function_map['RandomInit']()
+        kmeans.update_strategy = kmeans.function_map['MacQueenUpdate']()
+        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data)
+
+    kmeans_instances[i] = kmeans
+
+    '''
+    kmeans.calc_nmi_skin_noskin_data(), kmeans.calc_wcss()
+'''
+    exit()
         

@@ -76,14 +76,13 @@ class MacQueenUpdate(AbstractUpdate):
         sum_update_time = 0.0
         n_iterations = 0
         epsilon = [10**-6]*len(point_cloud[0])
-        idx_of_last_change = -1
         meaningful_diff = True
         prevClusters = {}
         updated_centroids = [point_cloud[i] for i in centroid_indices]
         mean_dist_per_iteration = {}
         while True:
             # Base conditions
-            if(n_iterations >= 10):
+            if(n_iterations >= 200):
                 break
             if not meaningful_diff:
                 break
