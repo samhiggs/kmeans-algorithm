@@ -19,7 +19,7 @@ class AccuracyTests(unittest.TestCase):
         kmeans.import_data()
         kmeans.convert_data()
         kmeans.transform_skin_noskin_data()
-        init_strategy = FarthestPointsInit()
+        init_strategy = PreClusteredSampleInit()
         kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.transformed_point_cloud)
         kmeans.update_strategy = LloydUpdate()
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.transformed_point_cloud)
@@ -31,17 +31,34 @@ class AccuracyTests(unittest.TestCase):
         kmeans.convert_data()
         kmeans.transform_HTRU_data()
         init_strategy = PreClusteredSampleInit()
-        kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.point_cloud)
+        kmeans.init_centroids = init_strategy.init(k_clusters=2, point_cloud=kmeans.transformed_point_cloud)
         kmeans.update_strategy = LloydUpdate()
-        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.point_cloud)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.transformed_point_cloud)
         return kmeans
 
     def test_nmi_skin_noskin(self):
         kmeans = self.setup_txt()
         nmi = kmeans.calc_nmi_skin_noskin_data()
+        print(nmi)
         assert nmi is not None
         assert nmi <= 1.0
         assert nmi >= 0.0
+        pass
+
+    def test_wscc_skin_noskin(self):
+        kmeans = self.setup_txt()
+        wcss = kmeans.calc_wcss()
+        print(wcss)
+        assert wcss is not None
+        assert wcss > 0.0
+        pass
+
+    def test_wscc_HTRU(self):
+        kmeans = self.setup_csv()
+        wcss = kmeans.calc_wcss()
+        print(wcss)
+        assert wcss is not None
+        assert wcss > 0.0
         pass
 
     def test_nmi_HTRU(self):

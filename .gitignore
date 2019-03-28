@@ -6,3 +6,6 @@ __pycache__
 .eggs
 .pytest_cache
 tests/__pycache__
+
+.egg
+build
