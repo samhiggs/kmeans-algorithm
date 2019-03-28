@@ -14,7 +14,7 @@ class AbstractUpdate(ABC):
 #https://pdfs.semanticscholar.org/0074/4cb7cc9ccbbcdadbd5ff2f2fee6358427271.pdf
 class LloydUpdate(AbstractUpdate):
 
-    def update(self, centroid_indices, point_cloud):
+    def update(self, centroid_indices, point_cloud, model_metdata):
         print('\n\nUpdating with Lloyd Update Strategy')
         start = time.time()
         #Initialize cluster KV dictionary, centroids.
@@ -68,7 +68,7 @@ class LloydUpdate(AbstractUpdate):
         return clusters
 
 class MacQueenUpdate(AbstractUpdate):
-    def update(self, centroid_indices, point_cloud):
+    def update(self, centroid_indices, point_cloud, model_metadata):
 
         print('\n\nUpdating with Macqueens Update Strategy')
         start = time.time()
@@ -158,8 +158,19 @@ class MacQueenUpdate(AbstractUpdate):
         print('Total iterations: {}'.format(n_iterations))
         print('Total updates: {}, Average update time {}'.format(n_updates, sum_update_time/n_updates))
         print('final centroids: ')
-
+        model_metadata['speed'] = end-start
+        model_metadata['n_iterations'] = n_iterations
+        model_metadata['n_updates'] = n_updates
+        model_metadata['average_time_per_update'] = sum_update_time/n_updates
+        model_metadata['n_clusters'] = len(prevClusters.keys())
+        model_metadata['clusters'] = {} 
+        
         for k,v in prevClusters.items():
+            model_metadata['clusters'][k] = {
+                'n_points': len(v['point_indices']),
+                'centroid': v['centroid']
+            }
+            
             print('cluster {}:'.format(k))
             [print('    ',i, ': ', val) for i,val in v.items() if i != 'point_indices']
             print('Number of points: {}'.format(len(v['point_indices'])))

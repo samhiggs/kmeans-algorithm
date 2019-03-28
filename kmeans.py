@@ -12,6 +12,16 @@ HTRU2:
 description: https://archive.ics.uci.edu/ml/datasets/HTRU2
 data:https://archive.ics.uci.edu/ml/machine-learning-databases/00372/
 
+@param k_clusters
+@param init_centroids = []
+@param optimized_clusters = {}
+@param raw_data is the data that comes in from the csv or text file
+@param processed_data is the result of any processing, such as removing result column.
+@param true_result_dict converts the true results into a dictionary
+@param raining_set not in use
+        self.test_set not in use
+        self.init_strategy defines the initialisation stragey used
+        self.update_strategy defines the update strategy used
 '''
 
 import numpy as np #useful for data analysis
@@ -32,6 +42,7 @@ import sys
 import configparser as cp
 import hashlib
 import itertools
+from datetime import datetime as dt
 
 from mpl_toolkits import mplot3d
 
@@ -44,6 +55,7 @@ class KMeans:
         self.k_clusters = k_clusters
         self.init_centroids = []
         self.optimized_clusters = {}
+        self.model_metadata = {}
         self.raw_data = dataset
         self.processed_data = dataset
         self.true_result_dict = None
@@ -138,9 +150,19 @@ class KMeans:
         for key in self.optimized_clusters.keys():
             centroid = self.optimized_clusters[key][0]
             for point_idx in self.optimized_clusters[key][1]:
-                wscc += np.power(np.linalg.norm(centroid - self.data[point_idx], ord=None),2)
+                wscc += np.power(np.linalg.norm(centroid - self.raw_data[point_idx], ord=None),2)
         return wscc
 
+    def export_results(self):
+        if self.optimized_clusters is None:
+            print('no results yet. Try running the optimisation')
+            return None
+        fn = dt.now().strftime("%Y%m%d-%H%M%S") + \
+            str(self.init_strategy).lower() + \
+            str(self.update_strategy).lower() + \
+            '.csv'
+        np.savetxt(fn, self.optimized_clusters, header=str(self.model_metadata))
+    
 
     #summary of data
     def dataSummary(self):
@@ -161,17 +183,17 @@ class KMeans:
         return self.k_clusters
     
     #create a training and test set of the data. Timeseries will need to be handled
-    #differently to other data..
-    def create_training_test_set(self, ratio=.8, timeseries=False):
-        if ratio < 0.0 or ratio > 1.0:
-            print('ratio must be as a float between 0.0 and 1.0')
-            return False
-        print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
-        self.training_set, self.test_set = train_test_split(self.data, ratio)
-        if self.training_set is not None and self.test_set is not None:
-            return True
-        return False
-        pass
+    # #differently to other data..
+    # def create_training_test_set(self, ratio=.8, timeseries=False):
+    #     if ratio < 0.0 or ratio > 1.0:
+    #         print('ratio must be as a float between 0.0 and 1.0')
+    #         return False
+    #     print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
+    #     self.training_set, self.test_set = train_test_split(self.data, ratio)
+    #     if self.training_set is not None and self.test_set is not None:
+    #         return True
+    #     return False
+    #     pass
 
     #assign k clusters to list
     def initialise_clusters(self):
@@ -242,7 +264,7 @@ if __name__ == '__main__':
         kmeans.import_data()
         kmeans.init_strategy = kmeans.function_map['RandomInit']()
         kmeans.update_strategy = kmeans.function_map['MacQueenUpdate']()
-        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
+        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data, model_metadata=model_metadata)
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data)
 
     kmeans_instances[i] = kmeans
