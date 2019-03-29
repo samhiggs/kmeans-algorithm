@@ -6,7 +6,7 @@ class AbstractUpdate(ABC):
 
     #Receives self, # of clusters, list of indices of initial centroids, and point cloud as parameters
     #Returns a KV dict containing the centroid_id as key, the centroids and the an array of point indices as values
-    def update(self, centroids, point_cloud):
+    def update(self, centroids, point_cloud, model_metadata):
         pass
 
 #Source:
@@ -14,15 +14,16 @@ class AbstractUpdate(ABC):
 #https://pdfs.semanticscholar.org/0074/4cb7cc9ccbbcdadbd5ff2f2fee6358427271.pdf
 class LloydUpdate(AbstractUpdate):
 
-    def update(self, centroid_indices, point_cloud, model_metdata):
+    def update(self, centroid_indices, point_cloud, model_metadata):
         print('\n\nUpdating with Lloyd Update Strategy')
         start = time.time()
         #Initialize cluster KV dictionary, centroids.
         clusters = {}
+        n_iterations = 0
         for i in centroid_indices:
             clusters[i] = [point_cloud[i],[]]  # i = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
-
         iter = 0
+        n_iterations += 1
         modified = True
         while modified:
             # print('\nIteration: {}'.format(iter))
@@ -64,7 +65,21 @@ class LloydUpdate(AbstractUpdate):
                         break
                 if modified: break
         end = time.time()
-        print('Lloyds completed in {} time.'.format(end - start))
+        print('Lloyds completed in {0:.2f} time.'.format(end - start))
+        print('Total iterations: {}'.format(n_iterations))
+        print('final centroids: ')
+        model_metadata['speed'] = end-start
+        model_metadata['n_iterations'] = n_iterations
+        model_metadata['n_updates'] = 0
+        model_metadata['average_time_per_update'] = (end-start)/n_iterations
+        model_metadata['n_clusters'] = len(clusters.keys())
+        model_metadata['clusters'] = {} 
+        
+        # for k,v in clusters.items():
+        #     model_metadata['clusters'][k] = {
+        #         'n_points': len(v['point_indices']),
+        #         'centroid': v['centroid']
+        #     }
         return clusters
 
 class MacQueenUpdate(AbstractUpdate):
@@ -187,5 +202,5 @@ class MacQueenUpdate(AbstractUpdate):
         
         finalPoints = {}
         for k,v in prevClusters.items():
-            finalPoints[k] = [v['centroid'], v['point_indices'].keys()]
+            finalPoints[k] = [v['centroid'], list(v['point_indices'].keys())]
         return finalPoints

@@ -61,8 +61,6 @@ class KMeans:
         self.raw_data = dataset
         self.processed_data = dataset
         self.true_result_dict = None
-        self.training_set = None
-        self.test_set = None
         self.init_strategy = None
         self.update_strategy = None
         self.plot_figure = None
@@ -149,6 +147,28 @@ class KMeans:
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
 
+    def _cleanup(self, name):
+        """Do cleanup for an attribute"""
+        value = getattr(self, name)
+        # self._pre_cleanup(name, value)
+        delattr(self, name)
+        # self._post_cleanup(name, value)
+    
+    def _cleanup_all(self):
+        values = ['init_centroids', 'optimized_clusters', 'model_metadata',
+            'init_strategy', 'update_strategy', 'plot_figure']
+        for v in values:
+            if v is not None:
+                self._cleanup(v)
+        for k in self.function_runtime_data.keys():
+            self.function_runtime_data.update({k : []})
+        print('attributes have been cleaned.')
+        self.model_metadata = {}
+        self.init_centroids = []
+        self.optimized_clusters = {}
+        self.init_strategy = None
+        self.update_strategy = None
+        self.plot_figure = None
     #Need the number of results. 
     def nmi_comparison(self):
         start = time.time()
@@ -175,17 +195,23 @@ class KMeans:
 
     def calc_wcss(self):
         start = time.time()
-        wscc = 0.0
-        for key in self.optimized_clusters.keys():
-            centroid = self.optimized_clusters[key][0]
-            for point_idx in self.optimized_clusters[key][1]:
-                wscc += np.power(np.linalg.norm(centroid - self.raw_data[point_idx], ord=None),2)
+        wscc_results = {}
+        for cluster in self.optimized_clusters.keys():
+            wscc = 0.0
+            centroid = self.optimized_clusters[cluster][0]
+            points = self.optimized_clusters[cluster][1]
+            for point_idx in points:
+                wscc += np.power(np.linalg.norm(self.processed_data[point_idx] - centroid, ord=None),2)
+            wscc_results[cluster] = [wscc, np.sqrt(wscc)]
+            print(cluster, ':',wscc, 'and sd is:', np.sqrt(wscc))
+
         self.model_metadata['wscc'] = wscc
+        print(wscc)
         end = time.time()
         self.function_runtime_data['calc_wcss'].append([end-start, sys.getsizeof(self.optimized_clusters)])
         return wscc
 
-    def export_results(self):
+    def export_results(self, init_strategy, update_strategy):
         start = time.time()
         if self.optimized_clusters is None:
             print('no results yet. Try running the optimisation')
@@ -193,7 +219,9 @@ class KMeans:
         # print(self.init_strategy, self.update_strategy)
         fn = dt.now().strftime("%Y%m%d-%H%M%S")+'.csv'
         if self.results_dir is not None:
-            fnp = self.results_dir + '/' + fn
+            fnp = self.results_dir + '/' + \
+                init_strategy.lower() + '-' + \
+                update_strategy.lower() + '-' + fn
         with open(fnp, 'w', newline='') as csvfile:
             #write metadata to file
             writer = csv.writer(csvfile)
@@ -316,16 +344,28 @@ if __name__ == '__main__':
         exit()
     s_combinations = [(i,j) for j in update_strategies for i in init_strategies]
     kmeans_instances = {}
+    user_input = ''
     for i,dataset in enumerate(datasets):
         kmeans = KMeans(data_dir+'/'+dataset[0], dataset[1])
         kmeans.results_dir = results_dir
         kmeans.import_data()
         kmeans.process_true_data()
-        kmeans.init_strategy = kmeans.function_map['RandomInit']()
-        kmeans.update_strategy = kmeans.function_map['MacQueenUpdate']()
-        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
-        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, model_metadata=kmeans.model_metadata)
-        kmeans.export_results()
+        while True:
+            #If you want to run combinations independently, otherwise just comment out
+            print('available combinations are:')
+            [print(i, c) for i, c in enumerate(s_combinations)]
+            print('Please select a combination or exit')
+            user_input = input()
+            if input == 'exit':
+                exit()
+            selection = int(user_input)
+            kmeans.init_strategy = kmeans.function_map[s_combinations[selection][0]]()
+            kmeans.update_strategy = kmeans.function_map[s_combinations[selection][1]]()
+            kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
+            kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
+            kmeans.calc_wcss()
+            kmeans.export_results(s_combinations[i][0], s_combinations[i][1])
+            kmeans._cleanup_all()
         # kmeans.nmi_comparison()
 
     kmeans_instances[i] = kmeans
