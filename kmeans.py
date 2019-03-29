@@ -364,7 +364,7 @@ if __name__ == '__main__':
             kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
             kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
             kmeans.calc_wcss()
-            kmeans.export_results(s_combinations[i][0], s_combinations[i][1])
+            kmeans.export_results(s_combinations[selection][0], s_combinations[selection][1])
             kmeans._cleanup_all()
         # kmeans.nmi_comparison()
 
