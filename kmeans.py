@@ -43,7 +43,7 @@ import configparser as cp
 import hashlib
 import itertools
 from datetime import datetime as dt
-
+import csv
 from mpl_toolkits import mplot3d
 
 import os
@@ -63,6 +63,8 @@ class KMeans:
         self.test_set = None
         self.init_strategy = None
         self.update_strategy = None
+        self.plot_figure = None
+        self.results_dir = None
         self.function_map = {
             'RandomInit': RandomInit,
             'FarthestPointsInit': FarthestPointsInit,
@@ -114,6 +116,7 @@ class KMeans:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
             print(len(self.optimized_clusters[key][1]))
         plt.show()
+        #need to store figure
 
     def process_true_data(self):
         true_data_dict = {}
@@ -143,6 +146,7 @@ class KMeans:
                         self.true_result_dict[cluster], 
                         self.optimized_clusters[cluster]
                     )
+        self.model_metadata['nmi_comparison'] = normalised_scores
         return normalised_scores
 
     def calc_wcss(self):
@@ -151,18 +155,47 @@ class KMeans:
             centroid = self.optimized_clusters[key][0]
             for point_idx in self.optimized_clusters[key][1]:
                 wscc += np.power(np.linalg.norm(centroid - self.raw_data[point_idx], ord=None),2)
+        self.model_metadata['wscc'] = wscc
         return wscc
 
     def export_results(self):
         if self.optimized_clusters is None:
             print('no results yet. Try running the optimisation')
             return None
-        fn = dt.now().strftime("%Y%m%d-%H%M%S") + \
-            str(self.init_strategy).lower() + \
-            str(self.update_strategy).lower() + \
-            '.csv'
-        np.savetxt(fn, self.optimized_clusters, header=str(self.model_metadata))
+        # print(self.init_strategy, self.update_strategy)
+        fn = dt.now().strftime("%Y%m%d-%H%M%S")+'.csv'
+        if self.results_dir is not None:
+            fn = self.results_dir + '/' + fn
+        with open(fn, 'w', newline='') as csvfile:
+            #write metadata to file
+            writer = csv.writer(csvfile)
+            writer.writerow(['runtime', dt.now().strftime("%Y%m%d-%H%M%S")])
+            writer.writerow(['initialisation', 'TODO'])
+            writer.writerow(['update', 'TODO'])
+            for key, value in self.model_metadata.items():
+                if type(value) == type(list()) or type(value) == type(dict()):
+                    continue
+                writer.writerow([key, value])
+            #write cluster specific metadata
+            if 'clusters' in self.model_metadata:
+                writer = csv.writer(csvfile)
+                for k,v in self.model_metadata['clusters'].items():
+                    for ki, vi in v.items():
+                        writer.writerow(['cluster ' + str(k), ki, vi])
+            print(self.optimized_clusters.keys())
+            #write cluster idx to file
+            for kid, vid in self.optimized_clusters.items():
+                writer.writerow([kid, vid[0]])
+                for el in vid[1]:
+                    writer.writerow([kid, el])
+
+        if self.plot_figure is not None:
+            #TODO
+            pass
     
+    def import_results(self):
+        #TODO
+        pass
 
     #summary of data
     def dataSummary(self):
@@ -201,29 +234,11 @@ class KMeans:
         self.init_strategy.init(self.k_clusters, self.training_set)
         #Returns a list of indices of the initial cluster points of the dataset
 
-    def initial_observations(self):
-        print('running initial observation of clusters...')
-        #TODO
-        pass
-
-    def recursive_observations(self):
-        print('running algorithm...')
-        #TODO
-        pass
-
-    def print_clusters(self):
-        print('Here are the clusters')
-        #Lorenz: Clusters are thousands of dots, printing them to command line might not be the ideal option for visualizing them.
-        #TODO
-        pass
-
-
-
 #If we want to run as a script using some test data
 if __name__ == '__main__':
     cf = cp.ConfigParser()
     try:
-        cf.read('config_files/options.ini')
+        cf.read('config_files/options.ini', )
     except:
         print('couldnt read config file')
         exit()
@@ -234,6 +249,7 @@ if __name__ == '__main__':
 
     #Get data from parser    
     data_dir = cf['PATHS']['data_dir']
+    results_dir = cf['PATHS']['results_dir']
     datasets = [(cf['DATASETS'][key]).split() for key in cf['DATASETS']]
     init_strategies = cf['STRATEGIES']['init_strategies'].split()
     update_strategies = cf['STRATEGIES']['update_strategies'].split()
@@ -246,8 +262,10 @@ if __name__ == '__main__':
     #Check dataset can be found, if not remove it.
     for dataset in datasets:
         exists = os.path.isfile(data_dir+'/'+dataset[0])
-        if not exists or len(dataset) != 3:
+        if not exists:
             print(dataset, ' cannot be found')
+            continue
+        if  len(dataset) != 3:
             datasets.remove(dataset)
         try:
             dataset[1] = int(dataset[1])
@@ -261,12 +279,13 @@ if __name__ == '__main__':
     kmeans_instances = {}
     for i,dataset in enumerate(datasets):
         kmeans = KMeans(data_dir+'/'+dataset[0], dataset[1])
+        kmeans.results_dir = results_dir
         kmeans.import_data()
         kmeans.init_strategy = kmeans.function_map['RandomInit']()
         kmeans.update_strategy = kmeans.function_map['MacQueenUpdate']()
-        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data, model_metadata=model_metadata)
-        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data)
-
+        kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
+        kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, model_metadata=kmeans.model_metadata)
+        kmeans.export_results()
     kmeans_instances[i] = kmeans
 
     '''
