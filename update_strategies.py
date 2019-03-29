@@ -82,7 +82,7 @@ class MacQueenUpdate(AbstractUpdate):
         mean_dist_per_iteration = {}
         while True:
             # Base conditions
-            if(n_iterations >= 200):
+            if(n_iterations >= 3):
                 break
             if not meaningful_diff:
                 break
@@ -170,7 +170,7 @@ class MacQueenUpdate(AbstractUpdate):
                 'n_points': len(v['point_indices']),
                 'centroid': v['centroid']
             }
-            
+
             print('cluster {}:'.format(k))
             [print('    ',i, ': ', val) for i,val in v.items() if i != 'point_indices']
             print('Number of points: {}'.format(len(v['point_indices'])))

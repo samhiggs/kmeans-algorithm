@@ -115,6 +115,10 @@ class KMeans:
             if i == 2:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
             print(len(self.optimized_clusters[key][1]))
+        fn = dt.now().strftime("%Y%m%d-%H%M%S")+'.png'
+        if self.results_dir is not None:
+            fn = self.results_dir + '/' + fn
+        plt.savefig(fn)
         plt.show()
         #need to store figure
 
@@ -286,6 +290,7 @@ if __name__ == '__main__':
         kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, model_metadata=kmeans.model_metadata)
         kmeans.export_results()
+        kmeans.nmi_comparison()
     kmeans_instances[i] = kmeans
 
     '''
