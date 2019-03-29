@@ -33,6 +33,7 @@ from sklearn import metrics
 
 from init_strategies import PreClusteredSampleInit, FarthestPointsInit, RandomInit
 from update_strategies import LloydUpdate, MacQueenUpdate
+from scipy import stats
 
 import math
 import seaborn as sns #useful for splitting test and training data set and other machine learning methods
@@ -43,6 +44,7 @@ import configparser as cp
 import hashlib
 import itertools
 from datetime import datetime as dt
+import time
 import csv
 from mpl_toolkits import mplot3d
 
@@ -72,8 +74,18 @@ class KMeans:
             'MacQueenUpdate': MacQueenUpdate,
             'LloydUpdate': LloydUpdate
         }
+        self.function_runtime_data = {
+            'import_data': [],
+            'visualize_clusters' : [],
+            'process_true_data' : [],
+            'nmi_comparison' : [],
+            'calc_wcss' : [],
+            'export_results' : [],
+            'import_results' : [],
+        }
     #imports raw data and checks that it is a valid filetype.
     def import_data(self):
+        start = time.time()
         print('importing data from {}'.format(self.filename))
         #read the filetype and run relevant case
         filename, ftype = os.path.splitext(self.filename)
@@ -88,10 +100,12 @@ class KMeans:
         #Normalize data -> screws WSCC
         #self.transformed_data = preprocessing.normalize(self.transformed_data)
         self.processed_data = self.raw_data[:,:-1]
+        end = time.time()
+        self.function_runtime_data['import_data'].append([end-start, len(self.raw_data), ftype])
         
     def visualize_clusters_skin_noskin(self):
         #Source: https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
-
+        start = time.time()
         ax = plt.axes(projection='3d')
 
         # Data for three-dimensional scattered points
@@ -121,20 +135,23 @@ class KMeans:
         plt.savefig(fn)
         plt.show()
         #need to store figure
+        end = time.time()
+        self.function_runtime_data['visualize_clusters'].append(end-start)
 
     def process_true_data(self):
-        true_data_dict = {}
-        result_col = np.shape(self.raw_data)[1]
-        for idx in range(len(self.raw_data)):
-            result = self.raw_data[result_col]
-            if result not in true_data_dict:
-                true_data_dict[result] = [idx]
-            else:
-                true_data_dict[result].append(idx)
+        start = time.time()
+        print('reshaping true data in the form of results')
+        result_col = np.shape(self.raw_data)[1]-1
+        true_data_dict = {unique_result:[] for unique_result in np.unique(self.raw_data[:,result_col])}
+        for idx, row in enumerate(self.raw_data):
+            true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
+        end = time.time()
+        self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
 
     #Need the number of results. 
     def nmi_comparison(self):
+        start = time.time()
         if self.true_result_dict is None:
             self.process_true_data()
 
@@ -151,26 +168,33 @@ class KMeans:
                         self.optimized_clusters[cluster]
                     )
         self.model_metadata['nmi_comparison'] = normalised_scores
+
+        end = time.time()
+        self.function_runtime_data['nmi_comparison'].append([end-start, ])
         return normalised_scores
 
     def calc_wcss(self):
+        start = time.time()
         wscc = 0.0
         for key in self.optimized_clusters.keys():
             centroid = self.optimized_clusters[key][0]
             for point_idx in self.optimized_clusters[key][1]:
                 wscc += np.power(np.linalg.norm(centroid - self.raw_data[point_idx], ord=None),2)
         self.model_metadata['wscc'] = wscc
+        end = time.time()
+        self.function_runtime_data['calc_wcss'].append([end-start, sys.getsizeof(self.optimized_clusters)])
         return wscc
 
     def export_results(self):
+        start = time.time()
         if self.optimized_clusters is None:
             print('no results yet. Try running the optimisation')
             return None
         # print(self.init_strategy, self.update_strategy)
         fn = dt.now().strftime("%Y%m%d-%H%M%S")+'.csv'
         if self.results_dir is not None:
-            fn = self.results_dir + '/' + fn
-        with open(fn, 'w', newline='') as csvfile:
+            fnp = self.results_dir + '/' + fn
+        with open(fnp, 'w', newline='') as csvfile:
             #write metadata to file
             writer = csv.writer(csvfile)
             writer.writerow(['runtime', dt.now().strftime("%Y%m%d-%H%M%S")])
@@ -196,6 +220,16 @@ class KMeans:
         if self.plot_figure is not None:
             #TODO
             pass
+
+        end = time.time()
+
+        self.function_runtime_data['export_results'].append([end-start, sys.getsizeof(self.optimized_clusters)])
+        #Write function benchmarks to file
+        bmarkfn = self.results_dir + '/runtime-data-'+fn
+        with open(bmarkfn, 'w', newline='') as csvfile:
+            bmarkWriter = csv.writer(csvfile)
+            for bmark_key, bmark_val in self.function_runtime_data.items():
+                bmarkWriter.writerow([bmark_key] + bmark_val)
     
     def import_results(self):
         #TODO
@@ -240,6 +274,7 @@ class KMeans:
 
 #If we want to run as a script using some test data
 if __name__ == '__main__':
+    start = time.time()
     cf = cp.ConfigParser()
     try:
         cf.read('config_files/options.ini', )
@@ -285,14 +320,17 @@ if __name__ == '__main__':
         kmeans = KMeans(data_dir+'/'+dataset[0], dataset[1])
         kmeans.results_dir = results_dir
         kmeans.import_data()
+        kmeans.process_true_data()
         kmeans.init_strategy = kmeans.function_map['RandomInit']()
         kmeans.update_strategy = kmeans.function_map['MacQueenUpdate']()
         kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
         kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, model_metadata=kmeans.model_metadata)
         kmeans.export_results()
-        kmeans.nmi_comparison()
-    kmeans_instances[i] = kmeans
+        # kmeans.nmi_comparison()
 
+    kmeans_instances[i] = kmeans
+    end = time.time()
+    print('Program ran in {} seconds'.format(end-start))
     '''
     kmeans.calc_nmi_skin_noskin_data(), kmeans.calc_wcss()
 '''
