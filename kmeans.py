@@ -356,8 +356,8 @@ if __name__ == '__main__':
             [print(i, c) for i, c in enumerate(s_combinations)]
             print('Please select a combination or exit')
             user_input = input()
-            if input == 'exit':
-                exit()
+            if user_input == 'exit':
+                break
             selection = int(user_input)
             kmeans.init_strategy = kmeans.function_map[s_combinations[selection][0]]()
             kmeans.update_strategy = kmeans.function_map[s_combinations[selection][1]]()
