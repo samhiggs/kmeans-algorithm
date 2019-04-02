@@ -248,27 +248,27 @@ class KMeans:
             fnp = self.results_dir + '/' + \
                 init_strategy.lower() + '-' + \
                 update_strategy.lower() + '-' + fn
-        with open(fnp, 'w', newline='') as csvfile:
-            #write metadata to file
-            writer = csv.writer(csvfile)
-            writer.writerow(['runtime', dt.now().strftime("%Y%m%d-%H%M%S")])
-            writer.writerow(['initialisation', 'TODO'])
-            writer.writerow(['update', 'TODO'])
-            for key, value in self.model_metadata.items():
-                if type(value) == type(list()) or type(value) == type(dict()):
-                    continue
-                writer.writerow([key, value])
-            #write cluster specific metadata
-            if 'clusters' in self.model_metadata:
+            with open(fnp, 'w', newline='') as csvfile:
+                #write metadata to file
                 writer = csv.writer(csvfile)
-                for k,v in self.model_metadata['clusters'].items():
-                    for ki, vi in v.items():
-                        writer.writerow(['cluster ' + str(k), ki, vi])
-            #write cluster idx to file
-            for kid, vid in self.optimized_clusters.items():
-                writer.writerow([kid, vid[0]])
-                for el in vid[1]:
-                    writer.writerow([kid, el])
+                writer.writerow(['runtime', dt.now().strftime("%Y%m%d-%H%M%S")])
+                writer.writerow(['initialisation', 'TODO'])
+                writer.writerow(['update', 'TODO'])
+                for key, value in self.model_metadata.items():
+                    if type(value) == type(list()) or type(value) == type(dict()):
+                        continue
+                    writer.writerow([key, value])
+                #write cluster specific metadata
+                if 'clusters' in self.model_metadata:
+                    writer = csv.writer(csvfile)
+                    for k,v in self.model_metadata['clusters'].items():
+                        for ki, vi in v.items():
+                            writer.writerow(['cluster ' + str(k), ki, vi])
+                #write cluster idx to file
+                for kid, vid in self.optimized_clusters.items():
+                    writer.writerow([kid, vid[0]])
+                    for el in vid[1]:
+                        writer.writerow([kid, el])
 
         if self.plot_figure is not None:
             #TODO
