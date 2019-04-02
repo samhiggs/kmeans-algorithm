@@ -198,7 +198,7 @@ class KMeans:
         len_pred_c1 = len(self.optimized_clusters[1][1])
         len_act_c0 = len(self.true_result_dict[0])
         len_act_c1 = len(self.true_result_dict[1])
-        print(len_pred_c0, len_pred_c1, len_c1)
+        print(len_pred_c0, len_pred_c1, len_pred_c1, len_act_c1)
         for cluster,v in self.optimized_clusters.items():
             # print(cluster, v[1][:20])
             for idx in v[1]:
