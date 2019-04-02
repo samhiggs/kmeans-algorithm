@@ -144,6 +144,8 @@ class KMeans:
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
+        #print("asd")
+        #print(true_data_dict)
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
 
@@ -175,14 +177,21 @@ class KMeans:
         if self.true_result_dict is None:
             self.process_true_data()
 
+        print("ASD")
+        #print(len(self.true_result_dict))
+        #print(len(self.optimized_clusters))
+
         if(len(self.optimized_clusters.keys()) != len(self.true_result_dict)):
             print('The clusters or results have not been processed correctly.'\
                 'There are {} model results and {} true results'
                 .format(len(self.optimized_clusters.keys()), len(self.true_result_dict)))
             return
+
         #normalised scores per cluster
         normalised_scores = {}
         for cluster in self.true_result_dict.keys():
+            print(len(self.true_result_dict[cluster]))
+            print(len(self.optimized_clusters[cluster]))
             normalised_scores[cluster] = metrics.cluster.normalized_mutual_info_score(
                         self.true_result_dict[cluster], 
                         self.optimized_clusters[cluster]
@@ -365,8 +374,8 @@ if __name__ == '__main__':
             kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
             kmeans.calc_wcss()
             kmeans.export_results(s_combinations[selection][0], s_combinations[selection][1])
-            kmeans._cleanup_all()
-        # kmeans.nmi_comparison()
+            #kmeans._cleanup_all()
+            kmeans.nmi_comparison()
 
     kmeans_instances[i] = kmeans
     end = time.time()
