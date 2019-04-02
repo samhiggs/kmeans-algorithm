@@ -131,7 +131,7 @@ class KMeans:
                 ax.scatter3D(xdata, ydata, zdata, c='b', marker='.')
             if i == 2:
                 ax.scatter3D(xdata, ydata, zdata, c='g', marker='.')
-            print(len(self.optimized_clusters[key][1]))
+            # print(len(self.optimized_clusters[key][1]))
         fn = dt.now().strftime("%Y%m%d-%H%M%S")+'.png'
         if self.results_dir is not None:
             fn = self.results_dir + '/' + fn
@@ -146,7 +146,9 @@ class KMeans:
         print('reshaping true data in the form of results')
         
         result_col = np.shape(self.raw_data)[1]-1
-        true_data_dict = {unique_result:[] for unique_result in np.unique(self.raw_data[:,result_col])}
+        #This gets the number of unique results that exist in the our models output
+        true_data_dict = {int(unique_result):[] for unique_result in np.unique(self.raw_data[:,result_col])}
+        # print(true_data_dict.keys())
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
@@ -154,6 +156,9 @@ class KMeans:
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
 
+    #Function to convert the results from a dictionary to a list of 0's and 1's
+    def convert_results(self):
+        pass
     def _cleanup(self, name):
         """Do cleanup for an attribute"""
         value = getattr(self, name)
@@ -179,26 +184,40 @@ class KMeans:
     #Need the number of results. 
     def nmi_comparison(self):
         start = time.time()
-        if self.true_result_dict is None:
-            self.process_true_data()
 
-        if(len(self.optimized_clusters.keys()) != len(self.true_result_dict)):
+        if(len(self.optimized_clusters.keys()) != len(self.true_result_dict.keys())):
             print('The clusters or results have not been processed correctly.'\
                 'There are {} model results and {} true results'
-                .format(len(self.optimized_clusters.keys()), len(self.true_result_dict)))
+                .format(len(self.optimized_clusters.keys()), len(self.true_result_dict.keys())))
             return
-        #normalised scores per cluster
-        normalised_scores = {}
-        for cluster in self.true_result_dict.keys():
-            normalised_scores[cluster] = metrics.cluster.normalized_mutual_info_score(
-                        self.true_result_dict[cluster], 
-                        self.optimized_clusters[cluster]
-                    )
-        self.model_metadata['nmi_comparison'] = normalised_scores
-
+        ##RESULTS MUST BE A LIST OF 0's or 1's
+        # print(len(self.raw_data), len(self.optimized_clusters), self.true_result_dict)
+        predicted_clusters = [0]*len(self.raw_data)
+        actual_clusters = [0]*len(self.raw_data)
+        len_pred_c0 = len(self.optimized_clusters[0][1])
+        len_pred_c1 = len(self.optimized_clusters[1][1])
+        len_act_c0 = len(self.true_result_dict[0])
+        len_act_c1 = len(self.true_result_dict[1])
+        print(len_pred_c0, len_pred_c1, len_c1)
+        for cluster,v in self.optimized_clusters.items():
+            # print(cluster, v[1][:20])
+            for idx in v[1]:
+                predicted_clusters[idx] = cluster
+        for cluster,v in self.true_result_dict.items():
+            # print(cluster, v[:20])
+            for idx in v:
+                actual_clusters[idx] = cluster
+        # print(predicted_clusters[:100])
+        # print(actual_clusters[:100])
+        normalised_score = metrics.cluster.normalized_mutual_info_score(predicted_clusters, actual_clusters)
+        self.model_metadata['nmi_comparison'] = normalised_score
+        print('\nNMI Score: {}\n'.format(normalised_score))
         end = time.time()
         self.function_runtime_data['nmi_comparison'].append([end-start, ])
-        return normalised_scores
+        non_equal_indices = [i for i, item in enumerate(predicted_clusters) if item != actual_clusters[i]] 
+        print(non_equal_indices)
+
+        return normalised_score
 
     def calc_wcss(self):
         start = time.time()
@@ -210,10 +229,10 @@ class KMeans:
             for point_idx in points:
                 wscc += np.power(np.linalg.norm(self.processed_data[point_idx] - centroid, ord=None),2)
             wscc_results[cluster] = [wscc, np.sqrt(wscc)]
-            print(cluster, ':',wscc, 'and sd is:', np.sqrt(wscc))
+            print(cluster, 'WSCC score: ',wscc, 'and sd is:', np.sqrt(wscc))
 
         self.model_metadata['wscc'] = wscc
-        print(wscc)
+        # print(wscc)
         end = time.time()
         self.function_runtime_data['calc_wcss'].append([end-start, sys.getsizeof(self.optimized_clusters)])
         return wscc
@@ -245,7 +264,6 @@ class KMeans:
                 for k,v in self.model_metadata['clusters'].items():
                     for ki, vi in v.items():
                         writer.writerow(['cluster ' + str(k), ki, vi])
-            print(self.optimized_clusters.keys())
             #write cluster idx to file
             for kid, vid in self.optimized_clusters.items():
                 writer.writerow([kid, vid[0]])
@@ -303,6 +321,7 @@ def kmeans_runner(data_path, dataset, result_dir, combination):
     kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
     kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
     kmeans.calc_wcss()
+    kmeans.nmi_comparison()
     kmeans.export_results(combination[0], combination[1])
     kmeans._cleanup_all()
 

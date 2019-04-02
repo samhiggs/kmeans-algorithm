@@ -25,7 +25,7 @@ class AbstractInit(ABC):
 class RandomInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
-        print('\n\nInitializing with Random Points Strategy')
+        print('Initializing with Random Points Strategy')
 
         #seed = int(time.clock_gettime(time.CLOCK_REALTIME))
         np.random.seed()
@@ -47,7 +47,7 @@ class RandomInit(AbstractInit):
 class FarthestPointsInit(AbstractInit):
 
     def init(self, k_clusters, point_cloud):
-        print('\n\nInitializing with Farthest Points Strategy')
+        print('Initializing with Farthest Points Strategy')
 
         centroids_indices = []
 
@@ -119,7 +119,7 @@ class PreClusteredSampleInit(AbstractInit):
                 if end:
                     break
                 clusters[j] += new_points
-            print('Iteration: {}'.format(i))
+            # print('Iteration: {}'.format(i))
             if end:
                 break
 

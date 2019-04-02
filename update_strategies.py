@@ -15,7 +15,7 @@ class AbstractUpdate(ABC):
 class LloydUpdate(AbstractUpdate):
 
     def update(self, centroid_indices, point_cloud, model_metadata):
-        print('\n\nUpdating with Lloyd Update Strategy')
+        print('Updating with Lloyd Update Strategy')
         start = time.time()
         #Initialize cluster KV dictionary, centroids.
         clusters = {}
@@ -85,7 +85,7 @@ class LloydUpdate(AbstractUpdate):
 class MacQueenUpdate(AbstractUpdate):
     def update(self, centroid_indices, point_cloud, model_metadata):
 
-        print('\n\nUpdating with Macqueens Update Strategy')
+        print('Updating with Macqueens Update Strategy')
         start = time.time()
         n_updates = 0
         sum_update_time = 0.0
@@ -97,7 +97,7 @@ class MacQueenUpdate(AbstractUpdate):
         mean_dist_per_iteration = {}
         while True:
             # Base conditions
-            if(n_iterations >= 10):
+            if(n_iterations >= 7):
                 break
             if not meaningful_diff:
                 break
@@ -161,18 +161,18 @@ class MacQueenUpdate(AbstractUpdate):
                     print('key error', prevClusters.keys(), tmpClusters.keys())
             prevClusters = tmpClusters
             iter_end = time.time()
-            print('\nIteration: {}, time {}, updates: {}'
-                .format(n_iterations, iter_end - iter_start, n_updates_per_iteration))
+            # print('Iteration: {}, time {}, updates: {}'
+                # .format(n_iterations, iter_end - iter_start, n_updates_per_iteration))
             n_updates += n_updates_per_iteration
             n_iterations += 1
 
 
         end = time.time()
-        #Meta data for the 
+        #Meta data for the update algorithm.
         print('Macqueens completed in {:.2f} seconds'.format(end - start))
-        print('Total iterations: {}'.format(n_iterations))
-        print('Total updates: {}, Average update time {}'.format(n_updates, sum_update_time/n_updates))
-        print('final centroids: ')
+        # print('Total iterations: {}'.format(n_iterations))
+        # print('Total updates: {}, Average update time {}'.format(n_updates, sum_update_time/n_updates))
+        # print('final centroids: ')
         model_metadata['speed'] = end-start
         model_metadata['n_iterations'] = n_iterations
         model_metadata['n_updates'] = n_updates
@@ -186,19 +186,15 @@ class MacQueenUpdate(AbstractUpdate):
                 'centroid': v['centroid']
             }
 
-            print('cluster {}:'.format(k))
-            [print('    ',i, ': ', val) for i,val in v.items() if i != 'point_indices']
-            print('Number of points: {}'.format(len(v['point_indices'])))
-            # print('Point distances:')
-            # for p in v['point_indices']:
-            #     print('cluster: ', k, ' idx: ', p, '  distances: ', 
-            #     [print('cluster: ', k, 'dist', np.linalg.norm(point_cloud[p] - v['centroid'], ord=None)) for k,v in tmpClusters.items()])
-        print('\n')
-        for k,v in mean_dist_per_iteration.items():
-            print('Iteration ', k)
-            for subK, subV in v.items():
-                print('cluster:', subK)
-                print('mean of centroid points', subV['mean_of_points'])
+        #     print('cluster {}:'.format(k))
+        #     [print('    ',i, ': ', val) for i,val in v.items() if i != 'point_indices']
+        #     print('Number of points: {}'.format(len(v['point_indices'])))
+        # print('\n')
+        # for k,v in mean_dist_per_iteration.items():
+        #     print('Iteration ', k)
+        #     for subK, subV in v.items():
+        #         print('cluster:', subK)
+        #         print('mean of centroid points', subV['mean_of_points'])
         
         finalPoints = {}
         for k,v in prevClusters.items():
