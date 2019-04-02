@@ -152,7 +152,7 @@ class KMeans:
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
-        print( self.true_result_dict)
+        #print( self.true_result_dict)
         
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
