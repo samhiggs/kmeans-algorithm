@@ -148,10 +148,11 @@ class KMeans:
         result_col = np.shape(self.raw_data)[1]-1
         #This gets the number of unique results that exist in the our models output
         true_data_dict = {int(unique_result):[] for unique_result in np.unique(self.raw_data[:,result_col])}
-        # print(true_data_dict.keys())
+        #print(true_data_dict)
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
+        print( self.true_result_dict)
         
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
@@ -192,30 +193,31 @@ class KMeans:
             return
         ##RESULTS MUST BE A LIST OF 0's or 1's
         # print(len(self.raw_data), len(self.optimized_clusters), self.true_result_dict)
-        predicted_clusters = [0]*len(self.raw_data)
-        actual_clusters = [0]*len(self.raw_data)
-        len_pred_c0 = len(self.optimized_clusters[0][1])
-        len_pred_c1 = len(self.optimized_clusters[1][1])
-        len_act_c0 = len(self.true_result_dict[0])
-        len_act_c1 = len(self.true_result_dict[1])
-        print(len_pred_c0, len_pred_c1, len_pred_c1, len_act_c1)
-        for cluster,v in self.optimized_clusters.items():
-            # print(cluster, v[1][:20])
-            for idx in v[1]:
-                predicted_clusters[idx] = cluster
-        for cluster,v in self.true_result_dict.items():
-            # print(cluster, v[:20])
-            for idx in v:
-                actual_clusters[idx] = cluster
-        # print(predicted_clusters[:100])
-        # print(actual_clusters[:100])
+        predicted_clusters = []
+        actual_clusters = []
+        c1 = 0
+        #for cluster,v in self.optimized_clusters.items():
+        for key in self.optimized_clusters.keys():
+            for v in self.optimized_clusters[key][1]:
+                predicted_clusters.append(c1)
+            c1+=1
+
+        c2 = 0
+        #for cluster,v in self.true_result_dict.items():
+        #print(self.true_result_dict)
+        for key in self.true_result_dict.keys():
+            for v in self.true_result_dict[key]:
+                actual_clusters.append(c2)
+            c2+=1
+        #print(predicted_clusters[:30])
+        #print(actual_clusters[:30])
         normalised_score = metrics.cluster.normalized_mutual_info_score(predicted_clusters, actual_clusters)
         self.model_metadata['nmi_comparison'] = normalised_score
         print('\nNMI Score: {}\n'.format(normalised_score))
         end = time.time()
         self.function_runtime_data['nmi_comparison'].append([end-start, ])
         non_equal_indices = [i for i, item in enumerate(predicted_clusters) if item != actual_clusters[i]] 
-        print(non_equal_indices)
+        #print(non_equal_indices)
 
         return normalised_score
 
@@ -323,6 +325,7 @@ def kmeans_runner(data_path, dataset, result_dir, combination):
     kmeans.calc_wcss()
     kmeans.nmi_comparison()
     kmeans.export_results(combination[0], combination[1])
+    #kmeans.visualize_clusters_skin_noskin()
     kmeans._cleanup_all()
 
 

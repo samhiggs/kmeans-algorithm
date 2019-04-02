@@ -2,6 +2,7 @@
 venv
 sdm_assignment_1.egg-info
 .png
+.csv
 __pycache__
 .eggs
 .pytest_cache

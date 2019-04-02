@@ -20,8 +20,8 @@ class LloydUpdate(AbstractUpdate):
         #Initialize cluster KV dictionary, centroids.
         clusters = {}
         n_iterations = 0
-        for i in centroid_indices:
-            clusters[i] = [point_cloud[i],[]]  # i = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
+        for j, idx in enumerate(centroid_indices):
+            clusters[j] = [point_cloud[idx],[]]  # i = cluster id, centroid is the clusters centroid, [] contains the indices of the points of the cluster
         iter = 0
         n_iterations += 1
         modified = True
