@@ -148,7 +148,7 @@ class KMeans:
         result_col = np.shape(self.raw_data)[1]-1
         #This gets the number of unique results that exist in the our models output
         true_data_dict = {int(unique_result):[] for unique_result in np.unique(self.raw_data[:,result_col])}
-        #print(true_data_dict)
+
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
@@ -196,14 +196,12 @@ class KMeans:
         predicted_clusters = []
         actual_clusters = []
         c1 = 0
-        #for cluster,v in self.optimized_clusters.items():
         for key in self.optimized_clusters.keys():
             for v in self.optimized_clusters[key][1]:
                 predicted_clusters.append(c1)
             c1+=1
 
         c2 = 0
-        #for cluster,v in self.true_result_dict.items():
         #print(self.true_result_dict)
         for key in self.true_result_dict.keys():
             for v in self.true_result_dict[key]:
