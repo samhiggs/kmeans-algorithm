@@ -144,11 +144,13 @@ class KMeans:
     def process_true_data(self):
         start = time.time()
         print('reshaping true data in the form of results')
+        
         result_col = np.shape(self.raw_data)[1]-1
         true_data_dict = {unique_result:[] for unique_result in np.unique(self.raw_data[:,result_col])}
         for idx, row in enumerate(self.raw_data):
             true_data_dict[row[result_col]].append(idx)
         self.true_result_dict = true_data_dict
+        
         end = time.time()
         self.function_runtime_data['process_true_data'].append([end-start, len(true_data_dict), sys.getsizeof(true_data_dict)])
 
@@ -286,19 +288,6 @@ class KMeans:
         self.k_clusters = kClusters
         return self.k_clusters
     
-    #create a training and test set of the data. Timeseries will need to be handled
-    # #differently to other data..
-    # def create_training_test_set(self, ratio=.8, timeseries=False):
-    #     if ratio < 0.0 or ratio > 1.0:
-    #         print('ratio must be as a float between 0.0 and 1.0')
-    #         return False
-    #     print('creating a training and test dataset with a ratio of {}:{}'.format(ratio, 1-ratio))
-    #     self.training_set, self.test_set = train_test_split(self.data, ratio)
-    #     if self.training_set is not None and self.test_set is not None:
-    #         return True
-    #     return False
-    #     pass
-
     #assign k clusters to list
     def initialise_clusters(self):
         print('initialising clusters')
