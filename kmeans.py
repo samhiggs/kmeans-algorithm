@@ -12,16 +12,6 @@ HTRU2:
 description: https://archive.ics.uci.edu/ml/datasets/HTRU2
 data:https://archive.ics.uci.edu/ml/machine-learning-databases/00372/
 
-@param k_clusters
-@param init_centroids = []
-@param optimized_clusters = {}
-@param raw_data is the data that comes in from the csv or text file
-@param processed_data is the result of any processing, such as removing result column.
-@param true_result_dict converts the true results into a dictionary
-@param raining_set not in use
-        self.test_set not in use
-        self.init_strategy defines the initialisation stragey used
-        self.update_strategy defines the update strategy used
 '''
 
 import numpy as np #useful for data analysis
@@ -50,6 +40,19 @@ from mpl_toolkits import mplot3d
 
 import os
 
+
+'''
+@param k_clusters
+@param init_centroids = []
+@param optimized_clusters = {}
+@param raw_data is the data that comes in from the csv or text file
+@param processed_data is the result of any processing, such as removing result column.
+@param true_result_dict converts the true results into a dictionary
+@param training_set not in use
+        self.test_set not in use
+        self.init_strategy defines the initialisation stragey used
+        self.update_strategy defines the update strategy used
+'''
 class KMeans:
     
     def __init__(self, filename='', k_clusters=0, strategies=None, dataset=None):
@@ -81,7 +84,9 @@ class KMeans:
             'export_results' : [],
             'import_results' : [],
         }
+
     #imports raw data and checks that it is a valid filetype.
+    #
     def import_data(self):
         start = time.time()
         print('importing data from {}'.format(self.filename))
@@ -299,9 +304,33 @@ class KMeans:
         print('initialising clusters')
         self.init_strategy.init(self.k_clusters, self.training_set)
         #Returns a list of indices of the initial cluster points of the dataset
+        
+def kmeans_runner(data_path, dataset, result_dir, combination):
+    print(data_path, dataset, combination)
+
+    kmeans = KMeans(data_path+'/'+dataset[0], dataset[1]) #initialises a kmeans objects with a dataset and the number of clusters
+    kmeans.results_dir = results_dir
+    kmeans.import_data()
+    kmeans.process_true_data()
+    kmeans.init_strategy = kmeans.function_map[combination[0]]()
+    kmeans.update_strategy = kmeans.function_map[combination[1]]()
+    kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
+    kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
+    kmeans.calc_wcss()
+    kmeans.export_results(combination[0], combination[1])
+    kmeans._cleanup_all()
+
 
 #If we want to run as a script using some test data
 if __name__ == '__main__':
+    comb = -1
+    # print(len(sys.argv))
+    if len(sys.argv) == 2:
+        try:
+            comb = int(sys.argv[1])
+            print(comb)
+        except:
+            print('arg is not an integer')
     start = time.time()
     cf = cp.ConfigParser()
     try:
@@ -344,35 +373,28 @@ if __name__ == '__main__':
         exit()
     s_combinations = [(i,j) for j in update_strategies for i in init_strategies]
     kmeans_instances = {}
-    user_input = ''
-    for i,dataset in enumerate(datasets):
-        kmeans = KMeans(data_dir+'/'+dataset[0], dataset[1])
-        kmeans.results_dir = results_dir
-        kmeans.import_data()
-        kmeans.process_true_data()
-        while True:
-            #If you want to run combinations independently, otherwise just comment out
-            print('available combinations are:')
-            [print(i, c) for i, c in enumerate(s_combinations)]
-            print('Please select a combination or exit')
-            user_input = input()
-            if user_input == 'exit':
-                break
-            selection = int(user_input)
-            kmeans.init_strategy = kmeans.function_map[s_combinations[selection][0]]()
-            kmeans.update_strategy = kmeans.function_map[s_combinations[selection][1]]()
-            kmeans.init_centroids = kmeans.init_strategy.init(k_clusters=dataset[1], point_cloud=kmeans.processed_data)
-            kmeans.optimized_clusters = kmeans.update_strategy.update(kmeans.init_centroids, kmeans.processed_data, kmeans.model_metadata)
-            kmeans.calc_wcss()
-            kmeans.export_results(s_combinations[selection][0], s_combinations[selection][1])
-            kmeans._cleanup_all()
+    
+    if comb == -1:
+        user_input = ''
+        for i,dataset in enumerate(datasets):
+            while True:
+                print('Running Kmeans on {} with {} clusters'.format(dataset[0], dataset[1]))
+                #If you want to run combinations independently, otherwise just comment out
+                print('available combinations are:')
+                [print(i, c) for i, c in enumerate(s_combinations)]
+                print('Please select a combination or exit')
+                user_input = input()
+                if user_input == 'exit':
+                    break
+                selection = int(user_input)
+                kmeans_runner(data_dir, dataset, results_dir, s_combinations[selection])
         # kmeans.nmi_comparison()
-
-    kmeans_instances[i] = kmeans
+    else:
+        print('running script')
+        kmeans_runner(data_dir, dataset, results_dir, s_combinations[comb])
     end = time.time()
     print('Program ran in {} seconds'.format(end-start))
     '''
     kmeans.calc_nmi_skin_noskin_data(), kmeans.calc_wcss()
-'''
+    '''
     exit()
-        
