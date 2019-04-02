@@ -97,7 +97,7 @@ class MacQueenUpdate(AbstractUpdate):
         mean_dist_per_iteration = {}
         while True:
             # Base conditions
-            if(n_iterations >= 2):
+            if(n_iterations >= 10):
                 break
             if not meaningful_diff:
                 break

@@ -266,10 +266,6 @@ class KMeans:
             for bmark_key, bmark_val in self.function_runtime_data.items():
                 bmarkWriter.writerow([bmark_key] + bmark_val)
     
-    def import_results(self):
-        #TODO
-        pass
-
     #summary of data
     def dataSummary(self):
         #TODO
@@ -294,6 +290,7 @@ class KMeans:
         self.init_strategy.init(self.k_clusters, self.training_set)
         #Returns a list of indices of the initial cluster points of the dataset
         
+#Main helper function that will run 1 iteration of kmeans in the dataset.
 def kmeans_runner(data_path, dataset, result_dir, combination):
     print(data_path, dataset, combination)
 
