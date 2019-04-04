@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np #useful for data analysis
 import time
-import copy
 class AbstractUpdate(ABC):
 
     #Receives self, # of clusters, list of indices of initial centroids, and point cloud as parameters

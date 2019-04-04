@@ -2,6 +2,7 @@
 #### Kmeans implementation assignment 1 for Scientific Data Management ####
 ### See test folder for tests
 ### see data folder for datasets
+### run setup.py first so that packages can be appropriately imported.
 
 DATA SET SOURCES:
 skin_noskin: 
@@ -14,32 +15,16 @@ data:https://archive.ics.uci.edu/ml/machine-learning-databases/00372/
 
 '''
 
-import numpy as np #useful for data analysis
-import pandas as pd #useful for importing files and handling dataframes.
-import sklearn as skl #useful for initial analysis
-from sklearn.model_selection import train_test_split
-from sklearn import preprocessing
-from sklearn import metrics
-
 from init_strategies import PreClusteredSampleInit, FarthestPointsInit, RandomInit
 from update_strategies import LloydUpdate, MacQueenUpdate
-from scipy import stats
 
-import math
-import seaborn as sns #useful for splitting test and training data set and other machine learning methods
-from matplotlib import pyplot as plt #useful for visualising data
-import abc
-import sys
-import configparser as cp
-import hashlib
-import itertools
-from datetime import datetime as dt
-import time
-import csv
-from mpl_toolkits import mplot3d
+import numpy as np #dataframe object wrappers
+from sklearn import preprocessing #Used for normalizing the data
+from sklearn import metrics #Used for calculating the normalized mutual score
 
-import os
-
+from matplotlib import pyplot as plt #Used for plotting our results
+import sys, os, time, csv, configparser as cp #System packages
+from datetime import datetime as dt #system package
 
 '''
 @param k_clusters
@@ -340,7 +325,7 @@ if __name__ == '__main__':
     start = time.time()
     cf = cp.ConfigParser()
     try:
-        cf.read('config_files/options.ini', )
+        cf.read('config/options.ini', )
     except:
         print('couldnt read config file')
         exit()
